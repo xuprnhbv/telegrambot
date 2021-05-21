@@ -21,7 +21,8 @@ def add_all_handlers(updater: Updater):
     handler_arr = [
         CommandHandler('test', test),
         CommandHandler('emojitest', emoji_test),
-        CommandHandler('hebrew', hebrew)
+        CommandHandler('hebrew', hebrew),
+        MessageHandler(Filters.video, resend_vid)
     ]
 
     failed_handlers = []
@@ -37,12 +38,20 @@ def add_all_handlers(updater: Updater):
 
 
 def test(update, context):
+    print('Ran /test')
     context.bot.send_message(chat_id=update.effective_chat.id, text="hi, this chat is {}".format(update.effective_chat.id))
 
 
 def emoji_test(update, context):
+    print('Ran /emojitest')
     context.bot.send_message(chat_id=update.effective_chat.id, text=emoji.emojize('cool thing :thumbsup:', use_aliases=True))
 
 
 def hebrew(update, context):
+    print('Ran /hebrew')
     context.bot.send_message(chat_id=update.effective_chat.id, text='בוקר טוב :turtle:')
+
+
+def resend_vid(update, context):
+    print('Ran resend_vid')
+    context.bot.send_video(chat_id=update.effective_chat.id, caption='this was what you sent right?', video=update.message.effective_attachment)
