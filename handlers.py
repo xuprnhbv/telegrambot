@@ -1,10 +1,13 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from colorama import Fore
-from files import download_meme
+from files import download_meme, MEMES_PATH
 import emoji
+import re
+import os
 
 MANAGEMENT_CHAT = -1001413795548
 TEXT_COLOR = Fore.LIGHTWHITE_EX
+DATE_REGEX = r'^[0-9]{8}-[0-9]{6}$'
 
 
 def add_all_handlers(updater: Updater):
@@ -21,6 +24,7 @@ def add_all_handlers(updater: Updater):
     dispatcher = updater.dispatcher
     handler_arr = [
         MessageHandler(Filters.video & Filters.chat(MANAGEMENT_CHAT), save_meme),
+        CommandHandler('rm', remove_meme, filters=Filters.chat(MANAGEMENT_CHAT)),
         CommandHandler('test', test),
         CommandHandler('emojitest', emoji_test),
         CommandHandler('hebrew', hebrew),
@@ -54,11 +58,42 @@ def save_meme(update, context):
 
 
 def remove_meme(update, context):
-    print('{text}Removing {red}{}{text}...'.format())
+    if len(context.args) != 1:
+        context.bot.send_message(chat_id=MANAGEMENT_CHAT, text='Please specify date of file to remove.')
+        return
+
+    datestr = context.args[0]
+    print('{text}Removing meme...'.format(text=TEXT_COLOR))
+
+    if not re.search(DATE_REGEX, datestr):
+        print('{red}Bad input {}. Does not match regex.{text}'.format(datestr, red=Fore.LIGHTRED_EX, text=TEXT_COLOR))
+        context.bot.send_message(chat_id=MANAGEMENT_CHAT, text='Write date in format {} like specified when '
+                                                               'uploaded initially.'.format(DATE_REGEX))
+        return
+
+    did_delete = False
+    for filename in os.listdir(MEMES_PATH):
+        if filename.startswith(datestr):
+            try:
+                os.remove(os.path.join(MEMES_PATH, filename))
+                print('{text}Deleted file {yellow}{}{text}'.format(filename, yellow=Fore.LIGHTYELLOW_EX, text=TEXT_COLOR))
+                context.bot.send_message(chat_id=MANAGEMENT_CHAT, text='Deleted {} successfully.'.format(filename))
+                did_delete = True
+                break
+            except Exception as e:
+                print('{error}Exception raised: {}'.format(str(e), error=Fore.LIGHTRED_EX))
+                context.bot.send_message(chat_id=MANAGEMENT_CHAT, text='{error}Exception raised: {}'.format(str(e),
+                                                                                                            error=Fore.LIGHTRED_EX))
+                break
+
+    if not did_delete:
+        print('{text}No file starts with {red}{}{text}'.format(datestr, red=Fore.LIGHTRED_EX, text=TEXT_COLOR))
+        context.bot.send_message(chat_id=MANAGEMENT_CHAT, text='No such file {}'.format(datestr))
 
 
 def test(update, context):
     print('Ran /test')
+    print(str(type(context)))
     context.bot.send_message(chat_id=update.effective_chat.id,
                              text="hi, this chat is {}".format(update.effective_chat.id))
 
