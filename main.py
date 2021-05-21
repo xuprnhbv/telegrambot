@@ -1,11 +1,12 @@
 from telegram.ext import Updater
 from colorama import Fore, init
 from handlers import add_all_handlers
+from dailymeme import init_daily_meme
+from consts import TEXT_COLOR, DAILY_MEME_HOUR
 import threading
 import os
 
 RELATIVE_TOKEN_PATH = r'..\token.key'
-TEXT_COLOR = Fore.LIGHTWHITE_EX
 
 
 def main():
@@ -29,9 +30,15 @@ def main():
 
     print('{text}Starting the bot...'.format(text=TEXT_COLOR))
     updater.start_polling()
+    print('{text}Adding daily meme task...'.format(text=TEXT_COLOR))
+    daily_meme_thread = threading.Thread(target=init_daily_meme, args=[updater], daemon=True)
+    daily_meme_thread.start()
+    print('{text}Meme will be sent everyday at {yellow}{}{text}.'.format(DAILY_MEME_HOUR, yellow=Fore.LIGHTYELLOW_EX,
+                                                                         text=TEXT_COLOR))
     print('{nice}BOT RUNNING SUCCESSFULLY'.format(nice=Fore.LIGHTGREEN_EX))
     print('{text}Press Enter to close...'.format(text=TEXT_COLOR))
     input()
+    print('{text}Stopping Daily Meme thread...'.format(text=TEXT_COLOR))
     print('{text}Stopping updater...'.format(text=TEXT_COLOR))
     updater.stop()
     print('{red}BOT STOPPED SUCCESSFULLY{default}'.format(red=Fore.LIGHTRED_EX, default=Fore.WHITE))

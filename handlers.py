@@ -1,12 +1,12 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from colorama import Fore
-from files import download_meme, MEMES_PATH
+from files import download_meme, delete_meme, MEMES_PATH
+from consts import TEXT_COLOR
 import emoji
 import re
 import os
 
 MANAGEMENT_CHAT = -1001413795548
-TEXT_COLOR = Fore.LIGHTWHITE_EX
 DATE_REGEX = r'^[0-9]{8}-[0-9]{6}$'
 
 
@@ -25,9 +25,8 @@ def add_all_handlers(updater: Updater):
     handler_arr = [
         MessageHandler(Filters.video & Filters.chat(MANAGEMENT_CHAT), save_meme),
         CommandHandler('rm', remove_meme, filters=Filters.chat(MANAGEMENT_CHAT)),
+        CommandHandler('listmemes', listdir, filters=Filters.chat(MANAGEMENT_CHAT)),
         CommandHandler('test', test),
-        CommandHandler('emojitest', emoji_test),
-        CommandHandler('hebrew', hebrew),
     ]
 
     failed_handlers = []
@@ -75,7 +74,7 @@ def remove_meme(update, context):
     for filename in os.listdir(MEMES_PATH):
         if filename.startswith(datestr):
             try:
-                os.remove(os.path.join(MEMES_PATH, filename))
+                delete_meme(filename)
                 print('{text}Deleted file {yellow}{}{text}'.format(filename, yellow=Fore.LIGHTYELLOW_EX, text=TEXT_COLOR))
                 context.bot.send_message(chat_id=MANAGEMENT_CHAT, text='Deleted {} successfully.'.format(filename))
                 did_delete = True
@@ -91,9 +90,16 @@ def remove_meme(update, context):
         context.bot.send_message(chat_id=MANAGEMENT_CHAT, text='No such file {}'.format(datestr))
 
 
+def listdir(update, context):
+    print('{text}Listing memes dir...'.format(text=TEXT_COLOR))
+    memes = 'Memes directory:\n'
+    for filename in os.listdir(MEMES_PATH):
+        memes += '>' + filename + '\n'
+    context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=memes)
+
+
 def test(update, context):
     print('Ran /test')
-    print(str(type(context)))
     context.bot.send_message(chat_id=update.effective_chat.id,
                              text="hi, this chat is {}".format(update.effective_chat.id))
 

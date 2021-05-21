@@ -1,9 +1,8 @@
 from telegram import File
 from colorama import Fore
+from consts import MEMES_PATH
 import time
 import os
-
-MEMES_PATH = r"../videos/"
 
 
 def download_meme(file: File, name: str):
@@ -20,3 +19,11 @@ def download_meme(file: File, name: str):
         path = path = os.path.abspath(os.path.join(MEMES_PATH, name + '.mp4'))
     file.download(path)
     return path
+
+
+def delete_meme(filename):
+    """
+    Deletes meme from meme folder.
+    :param filename: name of file.
+    """
+    os.remove(os.path.join(MEMES_PATH, filename))
