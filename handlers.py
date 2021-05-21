@@ -1,7 +1,9 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from colorama import Fore
+from files import download_meme
 import emoji
 
+MANAGEMENT_CHAT = -1001413795548
 TEXT_COLOR = Fore.LIGHTWHITE_EX
 
 
@@ -17,12 +19,11 @@ def add_all_handlers(updater: Updater):
     """
     print('{text}Setting up dispatcher...'.format(text=TEXT_COLOR))
     dispatcher = updater.dispatcher
-
     handler_arr = [
+        MessageHandler(Filters.video & Filters.chat(MANAGEMENT_CHAT), save_meme),
         CommandHandler('test', test),
         CommandHandler('emojitest', emoji_test),
         CommandHandler('hebrew', hebrew),
-        MessageHandler(Filters.video, resend_vid)
     ]
 
     failed_handlers = []
@@ -31,20 +32,41 @@ def add_all_handlers(updater: Updater):
         try:
             dispatcher.add_handler(handler)
         except Exception as e:
-            print('{error}Exception raised: {}'.format(str(e), error=Fore.LIGHTRED_EX))
+            print('{error}Exception raised: {}{text}'.format(str(e), error=Fore.LIGHTRED_EX))
             failed_handlers.append(handler)
 
     return failed_handlers
 
 
+def save_meme(update, context):
+    print('{text}Saving meme...'.format(text=TEXT_COLOR))
+    file = update.message.effective_attachment.get_file()
+    name = update.message.caption
+    filename = ''
+    try:
+        filename = download_meme(file, name)
+    except Exception as e:
+        print('{error}Exception raised: {}'.format(str(e), error=Fore.LIGHTRED_EX))
+
+    if filename:
+        print('{text}Saved new meme: {yellow}{}{text}'.format(filename, text=TEXT_COLOR, yellow=Fore.LIGHTYELLOW_EX))
+        context.bot.send_message(chat_id=MANAGEMENT_CHAT, text='Saved successfully as {}'.format(filename))
+
+
+def remove_meme(update, context):
+    print('{text}Removing {red}{}{text}...'.format())
+
+
 def test(update, context):
     print('Ran /test')
-    context.bot.send_message(chat_id=update.effective_chat.id, text="hi, this chat is {}".format(update.effective_chat.id))
+    context.bot.send_message(chat_id=update.effective_chat.id,
+                             text="hi, this chat is {}".format(update.effective_chat.id))
 
 
 def emoji_test(update, context):
     print('Ran /emojitest')
-    context.bot.send_message(chat_id=update.effective_chat.id, text=emoji.emojize('cool thing :thumbsup:', use_aliases=True))
+    context.bot.send_message(chat_id=update.effective_chat.id,
+                             text=emoji.emojize('cool thing :thumbsup:', use_aliases=True))
 
 
 def hebrew(update, context):
@@ -54,4 +76,6 @@ def hebrew(update, context):
 
 def resend_vid(update, context):
     print('Ran resend_vid')
-    context.bot.send_video(chat_id=update.effective_chat.id, caption='this was what you sent right?', video=update.message.effective_attachment)
+    context.bot.send_video(chat_id=update.effective_chat.id, caption='this was what you sent right? and the text w'
+                                                                     'as {}'.format(update.message.caption),
+                           video=update.message.effective_attachment)
