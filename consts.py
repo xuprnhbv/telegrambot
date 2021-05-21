@@ -5,6 +5,5 @@ DAILY_MEME_HOUR = '06:30'
 MEMES_PATH = r"../videos/"
 BOKER_TOV = 'בוקר טוב '
 SEND_MEME_TO = [
-    -1001413795548,
-    -455126807,
+    -455126807, #008
 ]
