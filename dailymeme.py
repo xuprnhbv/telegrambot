@@ -7,14 +7,13 @@ import time
 import os
 import random
 
+
 def init_daily_meme(updater):
     """
     Initiates the daily meme schedule
     :param updater: the bot's updater object
     """
-    #schedule.every().day.at(DAILY_MEME_HOUR).do(send_random_meme, updater=updater)
-    time.sleep(1)
-    send_random_meme(updater)
+    schedule.every().day.at(DAILY_MEME_HOUR).do(send_random_meme, updater=updater)
 
     while True:
         schedule.run_pending()
