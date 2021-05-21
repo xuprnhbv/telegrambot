@@ -26,7 +26,7 @@ def add_all_handlers(updater: Updater):
         MessageHandler(Filters.video & Filters.chat(MANAGEMENT_CHAT), save_meme),
         CommandHandler('rm', remove_meme, filters=Filters.chat(MANAGEMENT_CHAT)),
         CommandHandler('listmemes', listdir, filters=Filters.chat(MANAGEMENT_CHAT)),
-        CommandHandler('test', test),
+        MessageHandler(Filters.text & (~Filters.command), at_efi),
     ]
 
     failed_handlers = []
@@ -120,3 +120,8 @@ def resend_vid(update, context):
     context.bot.send_video(chat_id=update.effective_chat.id, caption='this was what you sent right? and the text w'
                                                                      'as {}'.format(update.message.caption),
                            video=update.message.effective_attachment)
+
+
+def at_efi(update, context):
+    print('{text}@ing Efi...')
+    context.bot.send_message(chat_id=update.effective_chat.id, text='@efi')

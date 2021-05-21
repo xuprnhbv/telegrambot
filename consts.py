@@ -6,4 +6,5 @@ MEMES_PATH = r"../videos/"
 BOKER_TOV = 'בוקר טוב '
 SEND_MEME_TO = [
     -1001413795548,
+    -455126807,
 ]
