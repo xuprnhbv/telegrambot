@@ -35,9 +35,7 @@ def send_random_meme(updater: Updater):
     print('{text}Chosen {green}{}{text}! Sending meme...'.format(meme, green=Fore.LIGHTGREEN_EX, text=TEXT_COLOR))
     meme_caption = BOKER_TOV + meme[16:-4]
     try:
-        print(os.path.join(MEMES_PATH, meme))
         with open(os.path.join(MEMES_PATH, meme), 'rb') as meme_file:
-            print('i opened the file')
             print(SEND_MEME_TO)
             for cid in SEND_MEME_TO:
                 print(cid)
