@@ -1,4 +1,4 @@
-# telegrambot
+### telegrambot
 my telegram bot. initial purpose is for "good morning" memes, but ig ill use it for other stuff eventually
 
 # some info before we start
