@@ -2,11 +2,9 @@ from telegram.ext import Updater
 from colorama import Fore, init
 from handlers import add_all_handlers
 from dailymeme import init_daily_meme
-from consts import TEXT_COLOR, DAILY_MEME_HOUR
+from consts import TEXT_COLOR, DAILY_MEME_HOUR, RELATIVE_TOKEN_PATH
 import threading
 import os
-
-RELATIVE_TOKEN_PATH = r'..\token.key'
 
 
 def main():
