@@ -36,11 +36,11 @@ def send_random_meme(updater: Updater):
     meme_caption = BOKER_TOV + meme[16:-4]
     try:
         with open(os.path.join(MEMES_PATH, meme), 'rb') as meme_file:
-            print(SEND_MEME_TO)
             for cid in SEND_MEME_TO:
                 print(cid)
                 updater.bot.send_video(chat_id=cid, caption=meme_caption, video=meme_file)
                 print('{text}Meme sent to {yellow}{}{text}!'.format(cid, yellow=Fore.LIGHTYELLOW_EX, text=TEXT_COLOR))
+                meme_file.seek(0)
         print('{green}Finished sending daily meme!'.format(green=Fore.LIGHTGREEN_EX))
         delete_meme(meme)
         print('{text}Deleted file {yellow}{}{text}'.format(meme, yellow=Fore.LIGHTYELLOW_EX, text=TEXT_COLOR))
