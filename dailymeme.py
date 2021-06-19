@@ -1,6 +1,6 @@
 from telegram.ext import Updater
 from colorama import Fore
-from consts import DAILY_MEME_HOUR, TEXT_COLOR, MEMES_PATH, SEND_MEME_TO, BOKER_TOV
+from consts import DAILY_MEME_HOUR, TEXT_COLOR, MEMES_PATH, SEND_MEME_TO, BOKER_TOV, MANAGEMENT_CHAT
 from files import delete_meme
 import schedule
 import time
@@ -34,16 +34,23 @@ def send_random_meme(updater: Updater):
     meme = choose_random_meme()
     print('{text}Chosen {green}{}{text}! Sending meme...'.format(meme, green=Fore.LIGHTGREEN_EX, text=TEXT_COLOR))
     meme_caption = BOKER_TOV + meme[16:-4]
+    send_count = 0
     try:
         with open(os.path.join(MEMES_PATH, meme), 'rb') as meme_file:
-            print(SEND_MEME_TO)
             for cid in SEND_MEME_TO:
-                print(cid)
                 updater.bot.send_video(chat_id=cid, caption=meme_caption, video=meme_file)
                 print('{text}Meme sent to {yellow}{}{text}!'.format(cid, yellow=Fore.LIGHTYELLOW_EX, text=TEXT_COLOR))
+                meme_file.seek(0)
+                send_count += 1
         print('{green}Finished sending daily meme!'.format(green=Fore.LIGHTGREEN_EX))
-        delete_meme(meme)
-        print('{text}Deleted file {yellow}{}{text}'.format(meme, yellow=Fore.LIGHTYELLOW_EX, text=TEXT_COLOR))
+    except Exception as e:
+        print('{error}Exception raised: {}{text}'.format(str(e), error=Fore.LIGHTRED_EX, text=TEXT_COLOR))
+        updater.bot.send_message(chat_id=MANAGEMENT_CHAT, text='failed to send meme :(')
+
+    try:
+        if send_count > 0:
+            delete_meme(meme)
+            print('{text}Deleted file {yellow}{}{text}'.format(meme, yellow=Fore.LIGHTYELLOW_EX, text=TEXT_COLOR))
     except Exception as e:
         print('{error}Exception raised: {}{text}'.format(str(e), error=Fore.LIGHTRED_EX, text=TEXT_COLOR))
 
