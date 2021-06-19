@@ -1,6 +1,7 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from colorama import Fore
 from files import download_meme, delete_meme, MEMES_PATH
+from dailymeme import send_random_meme
 from consts import TEXT_COLOR
 import emoji
 import re
@@ -26,6 +27,7 @@ def add_all_handlers(updater: Updater):
         MessageHandler(Filters.video & Filters.chat(MANAGEMENT_CHAT), save_meme),
         CommandHandler('rm', remove_meme, filters=Filters.chat(MANAGEMENT_CHAT)),
         CommandHandler('listmemes', listdir, filters=Filters.chat(MANAGEMENT_CHAT)),
+        CommandHandler('forcesend', force_send_meme, filters=Filters.chat(MANAGEMENT_CHAT)),
         MessageHandler(Filters.regex('cs') & (~Filters.command), at_efi),
     ]
 
@@ -54,6 +56,11 @@ def save_meme(update, context):
     if filename:
         print('{text}Saved new meme: {yellow}{}{text}'.format(filename, text=TEXT_COLOR, yellow=Fore.LIGHTYELLOW_EX))
         context.bot.send_message(chat_id=MANAGEMENT_CHAT, text='Saved successfully as {}'.format(filename))
+
+
+def force_send_meme(update, context):
+    print('{text}Force sending meme...')
+    send_random_meme(context)
 
 
 def remove_meme(update, context):
