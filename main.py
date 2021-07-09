@@ -17,32 +17,34 @@ def main():
     init()
     token_path = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), RELATIVE_TOKEN_PATH))
     logger.log_setup()
-    logger.print_log('{text}Getting bot token from {url}{}{text}...'.format(token_path, text=TEXT_COLOR, url=Fore.LIGHTYELLOW_EX))
-    token = get_token()
-    logger.print_log('{text}Token: {tcolor}{}{text}'.format(token, text=TEXT_COLOR, tcolor=Fore.GREEN))
+    try:
+        logger.print_log('{text}Getting bot token from {url}{}{text}...'.format(token_path, text=TEXT_COLOR, url=Fore.LIGHTYELLOW_EX))
+        token = get_token()
+        logger.print_log('{text}Token: {tcolor}{}{text}'.format(token, text=TEXT_COLOR, tcolor=Fore.GREEN))
 
-    logger.print_log('{text}Setting up updater...'.format(text=TEXT_COLOR))
-    updater = Updater(token=token, use_context=True)
+        logger.print_log('{text}Setting up updater...'.format(text=TEXT_COLOR))
+        updater = Updater(token=token, use_context=True)
 
-    logger.print_log('{text}Adding handlers...'.format(text=TEXT_COLOR))
-    add_all_handlers(updater)
-    logger.print_log('{text}Done with handlers.'.format(text=TEXT_COLOR))
+        logger.print_log('{text}Adding handlers...'.format(text=TEXT_COLOR))
+        add_all_handlers(updater)
+        logger.print_log('{text}Done with handlers.'.format(text=TEXT_COLOR))
 
-    logger.print_log('{text}Starting the bot...'.format(text=TEXT_COLOR))
-    updater.start_polling()
-    logger.print_log('{text}Adding daily meme task...'.format(text=TEXT_COLOR))
-    daily_meme_thread = threading.Thread(target=init_daily_meme, args=[updater], daemon=True)
-    daily_meme_thread.start()
-    logger.print_log('{text}Meme will be sent everyday at {yellow}{}{text}.'.format(DAILY_MEME_HOUR, yellow=Fore.LIGHTYELLOW_EX,
-                                                                         text=TEXT_COLOR))
-    logger.print_log('{nice}BOT RUNNING SUCCESSFULLY'.format(nice=Fore.LIGHTGREEN_EX))
-    logger.print_log('{text}Press Enter to close...'.format(text=TEXT_COLOR))
-    input()
-    logger.print_log('{text}Stopping Daily Meme thread...'.format(text=TEXT_COLOR))
-    logger.print_log('{text}Stopping updater...'.format(text=TEXT_COLOR))
-    updater.stop()
-    logger.print_log('{red}BOT STOPPED SUCCESSFULLY{default}'.format(red=Fore.LIGHTRED_EX, default=Fore.WHITE))
-
+        logger.print_log('{text}Starting the bot...'.format(text=TEXT_COLOR))
+        updater.start_polling()
+        logger.print_log('{text}Adding daily meme task...'.format(text=TEXT_COLOR))
+        daily_meme_thread = threading.Thread(target=init_daily_meme, args=[updater], daemon=True)
+        daily_meme_thread.start()
+        logger.print_log('{text}Meme will be sent everyday at {yellow}{}{text}.'.format(DAILY_MEME_HOUR, yellow=Fore.LIGHTYELLOW_EX,
+                                                                             text=TEXT_COLOR))
+        logger.print_log('{nice}BOT RUNNING SUCCESSFULLY'.format(nice=Fore.LIGHTGREEN_EX))
+        print('{text}Press Enter to close...'.format(text=TEXT_COLOR))
+        input()
+        logger.print_log('{text}Stopping Daily Meme thread...'.format(text=TEXT_COLOR))
+        logger.print_log('{text}Stopping updater...'.format(text=TEXT_COLOR))
+        updater.stop()
+        logger.print_log('{red}BOT STOPPED SUCCESSFULLY{default}'.format(red=Fore.LIGHTRED_EX, default=Fore.WHITE))
+    except Exception as e:
+        logger.print_log('{error}Exception raised: {}{text}'.format(str(e), error=Fore.LIGHTRED_EX))
 
 def get_token():
     """
