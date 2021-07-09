@@ -8,6 +8,9 @@ import emoji
 import re
 import os
 
+MANAGEMENT_CHAT = -1001413795548
+DATE_REGEX = r'^[0-9]{8}-[0-9]{6}$'
+
 
 def add_all_handlers(updater: Updater):
     """
