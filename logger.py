@@ -1,4 +1,5 @@
 import logging
+import re
 from consts import LOG_PATH
 
 
@@ -18,12 +19,13 @@ def print_log(text, level='info'):
     print(text)
     level = level.lower()
     if level == 'info':
-        logging.info(_strip_unprintables(text))
+        logging.info(_escape_ansi(text))
     elif level == 'error':
-        logging.error(_strip_unprintables(text))
+        logging.error(_escape_ansi(text))
     elif level == 'critical':
-        logging.critical(_strip_unprintables(text))
+        logging.critical(_escape_ansi(text))
 
 
-def _strip_unprintables(text):
-    return "".join(c for c in text if c.isprintable())
+def _escape_ansi(line):
+    ansi_escape = re.compile(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')
+    return ansi_escape.sub('', line)
