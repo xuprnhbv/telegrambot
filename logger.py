@@ -12,6 +12,7 @@ def log_setup(print_console=True):
     :param print_console: whether to print to console
     :return:
     """
+    _should_print_to_console = print_console
     logging.basicConfig(filename=LOG_PATH, encoding='utf-8', level=logging.INFO, format='<%(asctime)s> %(message)s', datefmt=
                         "%m/%d/%Y %I:%M:%S %p")
 
