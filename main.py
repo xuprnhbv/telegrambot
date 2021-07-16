@@ -36,7 +36,7 @@ def main():
     logger.print_log('{text}Meme will be sent everyday at {yellow}{}{text}.'.format(DAILY_MEME_HOUR, yellow=Fore.LIGHTYELLOW_EX,
                                                                          text=TEXT_COLOR))
     logger.print_no_log('{nice}BOT RUNNING SUCCESSFULLY'.format(nice=Fore.LIGHTGREEN_EX))
-    print('{text}Press Enter to close...'.format(text=TEXT_COLOR))
+    logger.print_no_log('{text}Press Enter to close...'.format(text=TEXT_COLOR))
     input()
     logger.print_log('{text}Stopping Daily Meme thread...'.format(text=TEXT_COLOR))
     logger.print_log('{text}Stopping updater...'.format(text=TEXT_COLOR))
