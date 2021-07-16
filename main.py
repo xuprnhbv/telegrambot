@@ -26,7 +26,7 @@ def main():
 
     logger.print_log('{text}Adding handlers...'.format(text=TEXT_COLOR))
     add_all_handlers(updater)
-    logger.print_log('{text}Done with handlers.'.format(text=TEXT_COLOR))
+    logger.print_no_log('{text}Done with handlers.'.format(text=TEXT_COLOR))
 
     logger.print_log('{text}Starting the bot...'.format(text=TEXT_COLOR))
     updater.start_polling()
@@ -35,13 +35,14 @@ def main():
     daily_meme_thread.start()
     logger.print_log('{text}Meme will be sent everyday at {yellow}{}{text}.'.format(DAILY_MEME_HOUR, yellow=Fore.LIGHTYELLOW_EX,
                                                                          text=TEXT_COLOR))
-    logger.print_log('{nice}BOT RUNNING SUCCESSFULLY'.format(nice=Fore.LIGHTGREEN_EX))
+    logger.print_no_log('{nice}BOT RUNNING SUCCESSFULLY'.format(nice=Fore.LIGHTGREEN_EX))
     print('{text}Press Enter to close...'.format(text=TEXT_COLOR))
     input()
     logger.print_log('{text}Stopping Daily Meme thread...'.format(text=TEXT_COLOR))
     logger.print_log('{text}Stopping updater...'.format(text=TEXT_COLOR))
     updater.stop()
-    logger.print_log('{red}BOT STOPPED SUCCESSFULLY{default}'.format(red=Fore.LIGHTRED_EX, default=Fore.WHITE))
+    logger.print_no_log('{red}BOT STOPPED SUCCESSFULLY{default}'.format(red=Fore.LIGHTRED_EX, default=Fore.WHITE))
+
 
 def get_token():
     """
