@@ -16,6 +16,17 @@ def log_setup(print_console=True):
                         "%m/%d/%Y %I:%M:%S %p")
 
 
+def print_no_log(text):
+    """
+    Will print if _should_print_to_console is True.
+
+    :param text: text to print
+    :return:
+    """
+    if _should_print_to_console:
+        print(text)
+
+
 def print_log(text, level='info'):
     """
     Prints to console and logs to log.
