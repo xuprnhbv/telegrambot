@@ -2,10 +2,31 @@ import logging
 import re
 from consts import LOG_PATH
 
+_should_print_to_console = False
 
-def log_setup():
+
+def log_setup(print_console=True):
+    """
+    Set up the logger, must be called before using print_log
+
+    :param print_console: whether to print to console
+    :return:
+    """
+    global _should_print_to_console
+    _should_print_to_console = print_console
     logging.basicConfig(filename=LOG_PATH, encoding='utf-8', level=logging.INFO, format='<%(asctime)s> %(message)s', datefmt=
                         "%m/%d/%Y %I:%M:%S %p")
+
+
+def print_no_log(text):
+    """
+    Will print if _should_print_to_console is True.
+
+    :param text: text to print
+    :return:
+    """
+    if _should_print_to_console:
+        print(text)
 
 
 def print_log(text, level='info'):
@@ -16,7 +37,8 @@ def print_log(text, level='info'):
     :param level: logging leve.
     :return:
     """
-    print(text)
+    if _should_print_to_console:
+        print(text)
     level = level.lower()
     if level == 'info':
         logging.info(_escape_ansi(text))
