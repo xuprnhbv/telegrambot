@@ -67,6 +67,7 @@ def main_bg():
     logger.print_log('{text}Meme will be sent everyday at {yellow}{}{text}.'.format(DAILY_MEME_HOUR, yellow=Fore.LIGHTYELLOW_EX,
                                                                          text=TEXT_COLOR))
     updater.idle()
+    print('{red}BOT STOPPED SUCCESSFULLY'.format(red=Fore.LIGHTRED_EX))
 
 
 def get_token():
