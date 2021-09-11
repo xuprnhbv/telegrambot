@@ -47,9 +47,8 @@ def main():
 
 def main_bg():
     init()
-    logger._should_print_to_console = True
     token_path = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), RELATIVE_TOKEN_PATH))
-    logger.log_setup()
+    logger.log_setup(print_console=False)
     logger.print_log('{text}Getting bot token from {url}{}{text}...'.format(token_path, text=TEXT_COLOR, url=Fore.LIGHTYELLOW_EX))
     token = get_token()
     logger.print_log('{text}Token: {tcolor}{}{text}'.format(token, text=TEXT_COLOR, tcolor=Fore.GREEN))
