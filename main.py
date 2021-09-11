@@ -81,7 +81,7 @@ def get_token():
 
 
 if __name__ == '__main__':
-    if sys.argv[1] == 'bg':
+    if "bg" in sys.argv:
         main_bg()
     else:
         main()
