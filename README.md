@@ -18,3 +18,4 @@ it is built as follows:
 * set video for next day's daily meme, instead of sending random meme (/this_meme)
 * send git repo's last commit SHA and commit date for debugging purpose (/version) == IN DEVELOP ALREADY
 * IN SERVER manage periodic cron to automatically pull master branch!! (maybe even make /update_bot for self update?)
+* share link to telegram directly instead of sending video file (python ig Downloader?) 
