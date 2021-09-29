@@ -7,6 +7,8 @@ import logger
 import emoji
 import re
 import os
+import git
+import time
 
 MANAGEMENT_CHAT = -1001413795548
 DATE_REGEX = r'^[0-9]{8}-[0-9]{6}$'
@@ -29,6 +31,7 @@ def add_all_handlers(updater: Updater):
         CommandHandler('rm', remove_meme, filters=Filters.chat(MANAGEMENT_CHAT)),
         CommandHandler('listmemes', listdir, filters=Filters.chat(MANAGEMENT_CHAT)),
         CommandHandler('forcesend', force_send_meme, filters=Filters.chat(MANAGEMENT_CHAT)),
+        CommandHandler('version', get_version, filters=Filters.chat(MANAGEMENT_CHAT)),
         MessageHandler(Filters.regex('cs') & (~Filters.command), at_efi),
     ]
 
@@ -133,3 +136,11 @@ def resend_vid(update, context):
 def at_efi(update, context):
     logger.print_log('{text}@ing Efi...'.format(text=TEXT_COLOR))
     context.bot.send_message(chat_id=update.effective_chat.id, text='@efi')
+
+
+def get_version(update, context):
+    repo = git.Repo(search_parent_directories=True)
+    current_ver_date = time.ctime(repo.head.commit.committed_date)
+    current_ver_sha = repo.head.commit.hexsha
+    context.bot.send_message(chat_id=update.effective_chat.id, text=f"Branch: {repo.active_branch.name}\nLast Commit Date: "
+                                                              f"{current_ver_date}\nCommit SHA: {current_ver_sha}")

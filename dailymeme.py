@@ -34,7 +34,7 @@ def send_random_meme(updater: Updater):
     logger.print_log('{text}Choosing daily meme...'.format(text=TEXT_COLOR))
     meme = choose_random_meme()
     logger.print_log('{text}Chosen {green}{}{text}! Sending meme...'.format(meme, green=Fore.LIGHTGREEN_EX, text=TEXT_COLOR))
-    meme_caption = BOKER_TOV + meme[-5]
+    meme_caption = BOKER_TOV + meme[16:-4]
     send_count = 0
     try:
         with open(os.path.join(MEMES_PATH, meme), 'rb') as meme_file:
