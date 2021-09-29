@@ -141,5 +141,5 @@ def get_version(update, context):
     repo = git.repo(search_parent_directories=True)
     current_ver_date = repo.head.object.commited_datetime
     current_ver_sha = repo.head.object.hexsha
-    context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"Branch: {repo.active_branch.name}\nLast Commit Date: "
+    context.bot.send_message(chat_id=update.effective_chat.id, text=f"Branch: {repo.active_branch.name}\nLast Commit Date: "
                                                               f"{current_ver_date}\nCommit SHA: {current_ver_sha}")
