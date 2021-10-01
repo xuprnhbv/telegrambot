@@ -135,7 +135,7 @@ def resend_vid(update, context):
 
 def at_efi(update, context):
     logger.print_log('{text}@ing Efi...'.format(text=TEXT_COLOR))
-    context.bot.send_message(chat_id=update.effective_chat.id, text=f'(@Ofir)[tg://user?id={EFI_ID}]')
+    context.bot.send_message(chat_id=update.effective_chat.id, text=f'(@Ofir)[tg://user?id={EFI_ID}]', parse_mode="Markdown")
 
 
 def get_version(update, context):
