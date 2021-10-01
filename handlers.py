@@ -2,7 +2,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from colorama import Fore
 from files import download_meme, delete_meme, MEMES_PATH
 from dailymeme import send_random_meme
-from consts import TEXT_COLOR, MANAGEMENT_CHAT, DATE_REGEX
+from consts import TEXT_COLOR, MANAGEMENT_CHAT, DATE_REGEX, EFI_ID
 import logger
 import emoji
 import re
@@ -32,7 +32,7 @@ def add_all_handlers(updater: Updater):
         CommandHandler('listmemes', listdir, filters=Filters.chat(MANAGEMENT_CHAT)),
         CommandHandler('forcesend', force_send_meme, filters=Filters.chat(MANAGEMENT_CHAT)),
         CommandHandler('version', get_version, filters=Filters.chat(MANAGEMENT_CHAT)),
-        MessageHandler(Filters.regex('cs') & (~Filters.command), at_efi),
+        MessageHandler(Filters.regex(r'([cC][sS])+') & (~Filters.command), at_efi),
     ]
 
     failed_handlers = []
@@ -135,7 +135,7 @@ def resend_vid(update, context):
 
 def at_efi(update, context):
     logger.print_log('{text}@ing Efi...'.format(text=TEXT_COLOR))
-    context.bot.send_message(chat_id=update.effective_chat.id, text='@efi')
+    context.bot.send_message(chat_id=update.effective_chat.id, text=f'[@Ofir](tg://user?id={EFI_ID})', parse_mode="Markdown")
 
 
 def get_version(update, context):
