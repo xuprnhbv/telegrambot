@@ -17,4 +17,3 @@ it is built as follows:
 * proper context menu for managing the video directory (deleting etc) - (/manage_vids)
 * set video for next day's daily meme, instead of sending random meme (/this_meme)
 * IN SERVER manage periodic cron to automatically pull master branch!! (maybe even make /update_bot for self update?)
-* share link to telegram directly instead of sending video file (python ig Downloader?) 
