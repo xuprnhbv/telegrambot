@@ -174,7 +174,7 @@ def subscribe_to_memes(update, context):
 
 def unsubscribe_to_memes(update, context):
     chats = _get_chats()
-    if str(update.effective_chat.id) in chats.keys():
+    if str(update.effective_chat.id) not in chats.keys():
         context.bot.send_message(chat_id=update.effective_chat.id, text='You are not subscribed!')
         return
     chats.pop(str(update.effective_chat.id))
