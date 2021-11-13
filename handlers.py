@@ -161,7 +161,7 @@ def get_chat_ids(update, context):
 
 def subscribe_to_memes(update, context):
     chats = _get_chats()
-    if update.effective_chat.id in chats:
+    if update.effective_chat.id not in chats:
         context.bot.send_message(chat_id=update.effective_chat.id, text="You're already subscribed!")
     chats.update({update.effective_chat.id: update.effective_chat.username})
     with open(CHAT_IDS_PATH, 'w') as fd:
@@ -173,7 +173,7 @@ def subscribe_to_memes(update, context):
 
 def unsubscribe_to_memes(update, context):
     chats = _get_chats()
-    if update.effective_chat.id not in list(chats):
+    if update.effective_chat.id in list(chats):
         context.bot.send_message(chat_id=update.effective_chat.id, text='You are not subscribed!')
         return
     chats.pop(update.effective_chat.id)
