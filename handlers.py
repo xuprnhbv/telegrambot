@@ -2,6 +2,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from colorama import Fore
 from files import download_meme, delete_meme, MEMES_PATH
 from dailymeme import send_random_meme
+from chats import _get_chats
 from consts import TEXT_COLOR, MANAGEMENT_CHAT, DATE_REGEX, EFI_ID, CHAT_IDS_PATH
 import logger
 import emoji
@@ -33,6 +34,7 @@ def add_all_handlers(updater: Updater):
         CommandHandler('forcesend', force_send_meme, filters=Filters.chat(MANAGEMENT_CHAT)),
         CommandHandler('version', get_version, filters=Filters.chat(MANAGEMENT_CHAT)),
         CommandHandler('listchats', get_chat_ids, filters=Filters.chat(MANAGEMENT_CHAT)),
+        CommandHandler('subscribe', subscribe_to_memes),
         MessageHandler(Filters.regex(r'([cC][sS])+') & (~Filters.command), at_efi),
     ]
 
@@ -149,9 +151,18 @@ def get_version(update, context):
 
 
 def get_chat_ids(update, context):
-    with open(CHAT_IDS_PATH, 'r') as fd:
-        chats = json.load(fd)
+    chats = _get_chats()
     msg = "Chats that receive daily memes:\n"
     for name in chats:
         msg += f">> {name} ({chats[name]})\n"
     context.bot.send_message(chat_id=update.effective_chat.id, text=msg)
+
+
+def subscribe_to_memes(update, context):
+    chats = _get_chats()
+    chats.update({update.effective_chat.username: update.effective_chat.id})
+    with open(CHAT_IDS_PATH, 'w') as fd:
+        json.dump(chats, fd)
+    context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Added chat to daily memes: {update.effective_chat.username}"
+                                                          f" ({update.effective_chat.id})!!")
+    context.bot.send_message(chat_id=update.effective_chat.id, text="You've subscribed successfully!")
