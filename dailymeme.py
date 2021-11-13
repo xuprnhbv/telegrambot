@@ -74,4 +74,4 @@ def get_chat_list():
     :return: list of chat ids.
     """
     chat_dict = _get_chats()
-    return list(chat_dict.values())
+    return list(chat_dict.keys())

@@ -35,6 +35,7 @@ def add_all_handlers(updater: Updater):
         CommandHandler('version', get_version, filters=Filters.chat(MANAGEMENT_CHAT)),
         CommandHandler('listchats', get_chat_ids, filters=Filters.chat(MANAGEMENT_CHAT)),
         CommandHandler('subscribe', subscribe_to_memes),
+        CommandHandler('unsubscribe', unsubscribe_to_memes),
         MessageHandler(Filters.regex(r'([cC][sS])+') & (~Filters.command), at_efi),
     ]
 
@@ -153,16 +154,31 @@ def get_version(update, context):
 def get_chat_ids(update, context):
     chats = _get_chats()
     msg = "Chats that receive daily memes:\n"
-    for name in chats:
-        msg += f">> {name} ({chats[name]})\n"
+    for cid in chats:
+        msg += f">> {cid} ({chats[cid]})\n"
     context.bot.send_message(chat_id=update.effective_chat.id, text=msg)
 
 
 def subscribe_to_memes(update, context):
     chats = _get_chats()
-    chats.update({update.effective_chat.username: update.effective_chat.id})
+    if update.effective_chat.id in chats:
+        context.bot.send_message(chat_id=update.effective_chat.id, text="You're already subscribed!")
+    chats.update({update.effective_chat.id: update.effective_chat.username})
     with open(CHAT_IDS_PATH, 'w') as fd:
         json.dump(chats, fd)
     context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Added chat to daily memes: {update.effective_chat.username}"
                                                           f" ({update.effective_chat.id})!!")
     context.bot.send_message(chat_id=update.effective_chat.id, text="You've subscribed successfully!")
+
+
+def unsubscribe_to_memes(update, context):
+    chats = _get_chats()
+    if update.effective_chat.id not in list(chats):
+        context.bot.send_message(chat_id=update.effective_chat.id, text='You are not subscribed!')
+        return
+    chats.pop(update.effective_chat.id)
+    with open(CHAT_IDS_PATH, 'w') as fd:
+        json.dump(chats, fd)
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Unsubscribed successfully")
+    context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Removed {update.effective_chat.username} from "
+                                                           f"daily meme chats")
