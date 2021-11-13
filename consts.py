@@ -13,6 +13,7 @@ EFI_ID = 905200111
 HELP_OP = """Ido Moshe 2:
 /subscribe
 /unsubscribe
+/help
 """
 MANAGEMENT_HELP_OP = """Management:
 /rm <meme date>
