@@ -36,6 +36,7 @@ def add_all_handlers(updater: Updater):
         CommandHandler('listchats', get_chat_ids, filters=Filters.chat(MANAGEMENT_CHAT)),
         CommandHandler('subscribe', subscribe_to_memes),
         CommandHandler('unsubscribe', unsubscribe_to_memes),
+        CommandHandler('rmchat', kick_from_memes, filters=Filters.chat(MANAGEMENT_CHAT)),
         MessageHandler(Filters.regex(r'([cC][sS])+') & (~Filters.command), at_efi),
     ]
 
@@ -183,3 +184,17 @@ def unsubscribe_to_memes(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text="Unsubscribed successfully")
     context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Removed {update.effective_chat.username} from "
                                                            f"daily meme chats")
+
+
+def kick_from_memes(update, context):
+    if len(context.args) != 1:
+        context.bot.send_message(chat_id=update.effective_chat.id, text="Use it as /rmchat <chat id>")
+        return
+    chats = _get_chats()
+    rmchat_id = context.args[0]
+    if rmchat_id not in chats.keys():
+        context.bot.send_message(chat_id=update.effective_chat.id, text='Not a valid subbed chat.')
+        return
+    chats.pop(rmchat_id)
+    context.bot.send_message(chat_id=update.effective_chat.id, text=f"Successfully removed {rmchat_id}"
+                                                                    f" from daily meme chats.")
