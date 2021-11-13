@@ -173,7 +173,7 @@ def subscribe_to_memes(update, context):
     if str(update.effective_chat.id) in chats.keys():
         context.bot.send_message(chat_id=update.effective_chat.id, text="You're already subscribed!")
         return
-    chats.update({update.effective_chat.id: update.effective_chat.username})
+    chats.update({update.effective_chat.id: update.effective_chat.title})
     with open(CHAT_IDS_PATH, 'w') as fd:
         json.dump(chats, fd)
     context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Added chat to daily memes: {update.effective_chat.username}"
