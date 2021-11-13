@@ -10,5 +10,14 @@ CHAT_IDS_PATH = r'./../chat_ids.json'
 DATE_REGEX = r'^[0-9]{8}-[0-9]{6}$'
 LOG_PATH = r'./../botlog'
 EFI_ID = 905200111
-
-# 1095964157  gil
+HELP_OP = """Ido Moshe 2:
+/subscribe
+/unsubscribe
+"""
+MANAGEMENT_HELP_OP = """Management:
+/rm <meme date>
+/listmemes
+/listchats
+/rmchat <chat id>
+/forcesend
+/version"""
