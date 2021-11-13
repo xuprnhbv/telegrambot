@@ -2,15 +2,15 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from colorama import Fore
 from files import download_meme, delete_meme, MEMES_PATH
 from dailymeme import send_random_meme
-from consts import TEXT_COLOR, MANAGEMENT_CHAT, DATE_REGEX, EFI_ID
+from consts import TEXT_COLOR, MANAGEMENT_CHAT, DATE_REGEX, EFI_ID, CHAT_IDS_PATH
 import logger
 import emoji
 import re
 import os
 import git
 import time
+import json
 
-MANAGEMENT_CHAT = -1001413795548
 DATE_REGEX = r'^[0-9]{8}-[0-9]{6}$'
 
 
@@ -32,6 +32,7 @@ def add_all_handlers(updater: Updater):
         CommandHandler('listmemes', listdir, filters=Filters.chat(MANAGEMENT_CHAT)),
         CommandHandler('forcesend', force_send_meme, filters=Filters.chat(MANAGEMENT_CHAT)),
         CommandHandler('version', get_version, filters=Filters.chat(MANAGEMENT_CHAT)),
+        CommandHandler('listchats', get_chat_ids, filters=Filters.chat(MANAGEMENT_CHAT)),
         MessageHandler(Filters.regex(r'([cC][sS])+') & (~Filters.command), at_efi),
     ]
 
@@ -145,3 +146,12 @@ def get_version(update, context):
     current_ver_sha = repo.head.commit.hexsha
     context.bot.send_message(chat_id=update.effective_chat.id, text=f"Branch: {repo.active_branch.name}\nLast Commit Date: "
                                                               f"{current_ver_date}\nCommit SHA: {current_ver_sha}")
+
+
+def get_chat_ids(update, context):
+    with open(CHAT_IDS_PATH, 'r') as fd:
+        chats = json.load(fd)
+    msg = "Chats that receive daily memes:\n"
+    for name in chats:
+        msg += f">> {name} ({chats[name]})\n"
+    context.bot.send_message(chat_id=update.effective_chat.id, text=msg)
