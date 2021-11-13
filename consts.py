@@ -6,12 +6,9 @@ MEMES_PATH = r"../videos/"
 RELATIVE_TOKEN_PATH = r'../token.key'
 BOKER_TOV = 'בוקר טוב '
 MANAGEMENT_CHAT = -1001413795548
+CHAT_IDS_PATH = r'./../chat_ids.json'
 DATE_REGEX = r'^[0-9]{8}-[0-9]{6}$'
 LOG_PATH = r'./../botlog'
 EFI_ID = 905200111
-SEND_MEME_TO = [
-    -455126807,  # 008
-    1095964157, #gil
-]
 
 # 1095964157  gil
