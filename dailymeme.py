@@ -2,6 +2,7 @@ from telegram.ext import Updater
 from colorama import Fore
 from consts import DAILY_MEME_HOUR, TEXT_COLOR, MEMES_PATH, CHAT_IDS_PATH, BOKER_TOV, MANAGEMENT_CHAT
 from files import delete_meme
+from handlers import _get_chats
 import logger
 import schedule
 import time
@@ -72,11 +73,5 @@ def get_chat_list():
 
     :return: list of chat ids.
     """
-    try:
-        with open(CHAT_IDS_PATH, 'r') as fd:
-            chat_dict = json.load(fd)
-    except FileNotFoundError:
-        logger.print_log(f"No chat_ids.json file in {CHAT_IDS_PATH}")
-    except Exception as e:
-        raise e
+    chat_dict = _get_chats()
     return list(chat_dict.values())

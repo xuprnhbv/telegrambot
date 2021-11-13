@@ -33,6 +33,7 @@ def add_all_handlers(updater: Updater):
         CommandHandler('forcesend', force_send_meme, filters=Filters.chat(MANAGEMENT_CHAT)),
         CommandHandler('version', get_version, filters=Filters.chat(MANAGEMENT_CHAT)),
         CommandHandler('listchats', get_chat_ids, filters=Filters.chat(MANAGEMENT_CHAT)),
+        CommandHandler('subscribe', subscribe_to_memes),
         MessageHandler(Filters.regex(r'([cC][sS])+') & (~Filters.command), at_efi),
     ]
 
@@ -148,10 +149,28 @@ def get_version(update, context):
                                                               f"{current_ver_date}\nCommit SHA: {current_ver_sha}")
 
 
+def _get_chats():
+    try:
+        with open(CHAT_IDS_PATH, 'r') as fd:
+            return json.load(fd)
+    except FileNotFoundError:
+        logger.print_log(f"No chat_ids.json file in {CHAT_IDS_PATH}")
+    except Exception as e:
+        raise e
+
+
 def get_chat_ids(update, context):
-    with open(CHAT_IDS_PATH, 'r') as fd:
-        chats = json.load(fd)
+    chats = _get_chats()
     msg = "Chats that receive daily memes:\n"
     for name in chats:
         msg += f">> {name} ({chats[name]})\n"
     context.bot.send_message(chat_id=update.effective_chat.id, text=msg)
+
+
+def subscribe_to_memes(update, context):
+    chats = _get_chats()
+    chats.update({update.effective_chat.username: update.effective_chat.id})
+    context.bot.send_message(chat_id=MANAGEMENT_CHAT, msg=f"!!Added chat to daily memes: {update.effective_chat.username}"
+                                                          f" ({update.effective_chat.id})!!")
+    with open(CHAT_IDS_PATH, 'w') as fd:
+        json.dump(chats, fd)
