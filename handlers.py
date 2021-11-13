@@ -196,5 +196,7 @@ def kick_from_memes(update, context):
         context.bot.send_message(chat_id=update.effective_chat.id, text='Not a valid subbed chat.')
         return
     chats.pop(rmchat_id)
+    with open(CHAT_IDS_PATH, 'w') as fd:
+        json.dump(chats, fd)
     context.bot.send_message(chat_id=update.effective_chat.id, text=f"Successfully removed {rmchat_id}"
                                                                     f" from daily meme chats.")
