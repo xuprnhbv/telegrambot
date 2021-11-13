@@ -103,8 +103,9 @@ def remove_meme(update, context):
 
 def listdir(update, context):
     logger.print_log('{text}Listing memes dir...'.format(text=TEXT_COLOR))
-    memes = 'Memes directory:\n'
-    for filename in os.listdir(MEMES_PATH):
+    meme_dir = os.listdir(MEMES_PATH)
+    memes = f'Memes directory: {len(meme_dir)}\n'
+    for filename in meme_dir:
         memes += '>' + filename + '\n'
     context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=memes)
 
