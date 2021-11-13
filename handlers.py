@@ -161,7 +161,8 @@ def get_chat_ids(update, context):
 def subscribe_to_memes(update, context):
     chats = _get_chats()
     chats.update({update.effective_chat.username: update.effective_chat.id})
-    context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Added chat to daily memes: {update.effective_chat.username}"
-                                                          f" ({update.effective_chat.id})!!")
     with open(CHAT_IDS_PATH, 'w') as fd:
         json.dump(chats, fd)
+    context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Added chat to daily memes: {update.effective_chat.username}"
+                                                          f" ({update.effective_chat.id})!!")
+    context.bot.send_message(chat_id=update.effective_chat.id, text="You've subscribed successfully!")
