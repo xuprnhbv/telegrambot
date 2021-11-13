@@ -30,7 +30,7 @@ def send_random_meme(updater: Updater):
     :return:
     """
     if len(os.listdir(MEMES_PATH)) == 0:
-        logger.print_log('{red}NO MEME TO SEND!!!!!')
+        logger.print_log('NO MEME TO SEND!!!!!')
         updater.bot.send_message(chat_id=MANAGEMENT_CHAT, text="NO MEME TO SEND! ADD A MEME AND USE /forcesend!!!!")
         return
 
