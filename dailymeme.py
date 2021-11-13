@@ -30,7 +30,8 @@ def send_random_meme(updater: Updater):
     :return:
     """
     if len(os.listdir(MEMES_PATH)) == 0:
-        logger.print_log('{red}NO MEME TO SEND!!!!!')
+        logger.print_log('NO MEME TO SEND!!!!!')
+        updater.bot.send_message(chat_id=MANAGEMENT_CHAT, text="NO MEME TO SEND! ADD A MEME AND USE /forcesend!!!!")
         return
 
     logger.print_log('{text}Choosing daily meme...'.format(text=TEXT_COLOR))
@@ -55,6 +56,10 @@ def send_random_meme(updater: Updater):
         if send_count > 0:
             delete_meme(meme)
             logger.print_log('{text}Deleted file {yellow}{}{text}'.format(meme, yellow=Fore.LIGHTYELLOW_EX, text=TEXT_COLOR))
+            if len(os.listdir(MEMES_PATH)) == 1:
+                logger.print_log('1 meme left!')
+                updater.bot.send_message(chat_id=MANAGEMENT_CHAT, text="One meme left! Make sure to add another one"
+                                                                       " before tomorrow!")
     except Exception as e:
         logger.print_log('{error}Exception raised: {}{text}'.format(str(e), error=Fore.LIGHTRED_EX, text=TEXT_COLOR))
 
