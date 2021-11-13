@@ -149,16 +149,6 @@ def get_version(update, context):
                                                               f"{current_ver_date}\nCommit SHA: {current_ver_sha}")
 
 
-def _get_chats():
-    try:
-        with open(CHAT_IDS_PATH, 'r') as fd:
-            return json.load(fd)
-    except FileNotFoundError:
-        logger.print_log(f"No chat_ids.json file in {CHAT_IDS_PATH}")
-    except Exception as e:
-        raise e
-
-
 def get_chat_ids(update, context):
     chats = _get_chats()
     msg = "Chats that receive daily memes:\n"
