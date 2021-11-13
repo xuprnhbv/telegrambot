@@ -1,12 +1,13 @@
 from telegram.ext import Updater
 from colorama import Fore
-from consts import DAILY_MEME_HOUR, TEXT_COLOR, MEMES_PATH, SEND_MEME_TO, BOKER_TOV, MANAGEMENT_CHAT
+from consts import DAILY_MEME_HOUR, TEXT_COLOR, MEMES_PATH, CHAT_IDS_PATH, BOKER_TOV, MANAGEMENT_CHAT
 from files import delete_meme
 import logger
 import schedule
 import time
 import os
 import random
+import json
 
 
 def init_daily_meme(updater):
@@ -36,9 +37,10 @@ def send_random_meme(updater: Updater):
     logger.print_log('{text}Chosen {green}{}{text}! Sending meme...'.format(meme, green=Fore.LIGHTGREEN_EX, text=TEXT_COLOR))
     meme_caption = BOKER_TOV + meme[16:-4]
     send_count = 0
+    send_meme_to = get_chat_list()
     try:
         with open(os.path.join(MEMES_PATH, meme), 'rb') as meme_file:
-            for cid in SEND_MEME_TO:
+            for cid in send_meme_to:
                 updater.bot.send_video(chat_id=cid, caption=meme_caption, video=meme_file)
                 logger.print_log('{text}Meme sent to {yellow}{}{text}!'.format(cid, yellow=Fore.LIGHTYELLOW_EX, text=TEXT_COLOR))
                 meme_file.seek(0)
@@ -62,3 +64,19 @@ def choose_random_meme():
     :return: the filename of the random file.
     """
     return random.choice(os.listdir(MEMES_PATH))
+
+
+def get_chat_list():
+    """
+    Reads from chat_ids.json and returns list of chats.
+
+    :return: list of chat ids.
+    """
+    try:
+        with open(CHAT_IDS_PATH, 'r') as fd:
+            chat_dict = json.load(fd)
+    except FileNotFoundError:
+        logger.print_log(f"No chat_ids.json file in {CHAT_IDS_PATH}")
+    except Exception as e:
+        raise e
+    return list(chat_dict.values())
