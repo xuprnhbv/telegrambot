@@ -3,7 +3,7 @@ from colorama import Fore
 from files import download_meme, delete_meme, MEMES_PATH
 from dailymeme import send_random_meme
 from chats import _get_chats
-from consts import TEXT_COLOR, MANAGEMENT_CHAT, DATE_REGEX, EFI_ID, CHAT_IDS_PATH
+from consts import TEXT_COLOR, MANAGEMENT_CHAT, DATE_REGEX, EFI_ID, CHAT_IDS_PATH, HELP_OP, MANAGEMENT_HELP_OP
 import logger
 import emoji
 import re
@@ -29,6 +29,7 @@ def add_all_handlers(updater: Updater):
     dispatcher = updater.dispatcher
     handler_arr = [
         MessageHandler(Filters.video & Filters.chat(MANAGEMENT_CHAT), save_meme),
+        CommandHandler('help', help),
         CommandHandler('rm', remove_meme, filters=Filters.chat(MANAGEMENT_CHAT)),
         CommandHandler('listmemes', listdir, filters=Filters.chat(MANAGEMENT_CHAT)),
         CommandHandler('forcesend', force_send_meme, filters=Filters.chat(MANAGEMENT_CHAT)),
@@ -50,6 +51,13 @@ def add_all_handlers(updater: Updater):
             failed_handlers.append(handler)
 
     return failed_handlers
+
+
+def help(update, context):
+    msg = HELP_OP
+    if update.effective_chat.id == MANAGEMENT_CHAT:
+        msg += f'\n{MANAGEMENT_HELP_OP}'
+    context.bot.send_message(chat_id=update.effective_chat.id, text=msg)
 
 
 def force_send_meme(update, context):
