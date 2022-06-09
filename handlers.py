@@ -124,23 +124,6 @@ def listdir(update, context):
     context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=memes)
 
 
-def test(update, context):
-    logger.print_log('Ran /test')
-    context.bot.send_message(chat_id=update.effective_chat.id,
-                             text="hi, this chat is {}".format(update.effective_chat.id))
-
-
-def emoji_test(update, context):
-    logger.print_log('Ran /emojitest')
-    context.bot.send_message(chat_id=update.effective_chat.id,
-                             text=emoji.emojize('cool thing :thumbsup:', use_aliases=True))
-
-
-def hebrew(update, context):
-    logger.print_log('Ran /hebrew')
-    context.bot.send_message(chat_id=update.effective_chat.id, text='בוקר טוב :turtle:')
-
-
 def resend_vid(update, context):
     logger.print_log('Ran resend_vid')
     context.bot.send_video(chat_id=update.effective_chat.id, caption='this was what you sent right? and the text w'
