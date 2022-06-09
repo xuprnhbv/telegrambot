@@ -175,7 +175,7 @@ def subscribe_to_memes(update, context):
         context.bot.send_message(chat_id=update.effective_chat.id, text="You're already subscribed!")
         return
 
-    name = update.effective_chat.username if update.effective_chat.type == constants.ChatType.PRIVATE\
+    name = update.effective_chat.username if update.effective_chat.type == "private"\
         else update.effective_chat.title
 
     chats.update({update.effective_chat.id: name})
