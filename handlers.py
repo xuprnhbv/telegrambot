@@ -195,7 +195,7 @@ def unsubscribe_to_memes(update, context):
     chats.pop(str(update.effective_chat.id))
     with open(CHAT_IDS_PATH, 'w') as fd:
         json.dump(chats, fd)
-    name = update.effective_chat.username if update.effective_chat.type == constants.ChatType.PRIVATE \
+    name = update.effective_chat.username if update.effective_chat.type == "private" \
         else update.effective_chat.title
     context.bot.send_message(chat_id=update.effective_chat.id, text="Unsubscribed successfully")
     context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Removed {name} from "
