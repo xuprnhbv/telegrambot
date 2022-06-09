@@ -1,7 +1,5 @@
 from telegram import File
-from colorama import Fore
 from consts import MEMES_PATH
-import logger
 import time
 import os
 
