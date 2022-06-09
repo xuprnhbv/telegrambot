@@ -1,4 +1,5 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram import constants
 from colorama import Fore
 from files import download_meme, delete_meme, MEMES_PATH
 from dailymeme import send_random_meme
@@ -173,10 +174,15 @@ def subscribe_to_memes(update, context):
     if str(update.effective_chat.id) in chats.keys():
         context.bot.send_message(chat_id=update.effective_chat.id, text="You're already subscribed!")
         return
-    chats.update({update.effective_chat.id: update.effective_chat.title})
+
+    name = update.effective_chat.username if update.effective_chat.type == "private"\
+        else update.effective_chat.title
+
+    chats.update({update.effective_chat.id: name})
     with open(CHAT_IDS_PATH, 'w') as fd:
         json.dump(chats, fd)
-    context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Added chat to daily memes: {update.effective_chat.title}"
+    context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Added {update.effective_chat.type} to daily memes: "
+                                                           f"{name}"
                                                           f" ({update.effective_chat.id})!!")
     context.bot.send_message(chat_id=update.effective_chat.id, text="You've subscribed successfully!")
 
@@ -189,8 +195,10 @@ def unsubscribe_to_memes(update, context):
     chats.pop(str(update.effective_chat.id))
     with open(CHAT_IDS_PATH, 'w') as fd:
         json.dump(chats, fd)
+    name = update.effective_chat.username if update.effective_chat.type == "private" \
+        else update.effective_chat.title
     context.bot.send_message(chat_id=update.effective_chat.id, text="Unsubscribed successfully")
-    context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Removed {update.effective_chat.username} from "
+    context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Removed {name} from "
                                                            f"daily meme chats")
 
 

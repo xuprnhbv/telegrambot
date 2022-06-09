@@ -1,7 +1,5 @@
 from telegram import File
-from colorama import Fore
 from consts import MEMES_PATH
-import logger
 import time
 import os
 
@@ -17,7 +15,7 @@ def download_meme(file: File, name: str):
     """
     path = os.path.abspath(os.path.join(MEMES_PATH, time.strftime("%Y%m%d-%H%M%S") + '_' + name + '.mp4'))
     if os.path.lexists(path):
-        path = path = os.path.abspath(os.path.join(MEMES_PATH, name + '.mp4'))
+        path = os.path.abspath(os.path.join(MEMES_PATH, name + '.mp4'))
     file.download(path)
     return path
 
