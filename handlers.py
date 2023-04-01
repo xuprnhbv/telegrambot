@@ -453,7 +453,7 @@ def chats_keyboard():
     for chat_row in [list(chats.keys())[i:i + row_length] for i in range(0, len(chats.keys()), row_length)]:
         row = []
         for chat in chat_row:
-            row.append(InlineKeyboardButton(text=f"{chat} ({chats[chat]})", callback_data=f'cht;{chat}'))
+            row.append(InlineKeyboardButton(text=f"{chats[chat]} ({chat})", callback_data=f'cht;{chat}'))
         keyboard.append(row)
     keyboard.append([InlineKeyboardButton(text='Go back', callback_data='main_menu')])
     return InlineKeyboardMarkup(keyboard)
