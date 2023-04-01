@@ -220,11 +220,11 @@ def get_inline_handlers():
         CallbackQueryHandler(unsubscribe_inline, pattern='unsubscribe'),
         CallbackQueryHandler(show_next_meme, pattern='show-next-meme'),
         CallbackQueryHandler(reset_next_meme, pattern='reset-next-meme'),
+        CallbackQueryHandler(chat_actions_inline_menu, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'cht')),
         CallbackQueryHandler(choose_next_meme_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'c')),
         CallbackQueryHandler(file_actions_inline_menu, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'f')),
         CallbackQueryHandler(force_send_now_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'fsn')),
         CallbackQueryHandler(force_send_now_yn_inline, pattern="^(fsn@_@){1}((yes)|(no)){1}"),
-        CallbackQueryHandler(chat_actions_inline_menu, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'cht')),
         CallbackQueryHandler(delete_meme_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'd')),
         CallbackQueryHandler(kick_chat_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'chtkick')),
         CallbackQueryHandler(close_inline_menu, pattern='close'),
@@ -261,7 +261,6 @@ def chats_inline_menu(update, _):
 
 
 def chat_actions_inline_menu(update, _):
-    logger.print_log('entering inline chats')
     chat_chosen = update.callback_query.data.split(';')[1]
     chats = _get_chats()
     update.callback_query.message.edit_text(f'Choose an action for chat {chats[chat_chosen]}',
