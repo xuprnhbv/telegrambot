@@ -239,7 +239,9 @@ def main_inline_menu(update, _):
 
 
 def files_inline_menu(update, context):
-    update.callback_query.message.edit_text('Choose a file to continue', reply_markup=files_keyboard())
+    length = len(os.listdir(MEMES_PATH))
+    update.callback_query.message.edit_text(f'Meme List ({length}). Choose a file to continue.'
+                                            , reply_markup=files_keyboard())
 
 
 def file_actions_inline_menu(update, _):
