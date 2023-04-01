@@ -8,6 +8,7 @@ BOKER_TOV = 'בוקר טוב '
 MANAGEMENT_CHAT = -1001413795548
 CHAT_IDS_PATH = r'./../chat_ids.json'
 DATE_REGEX = r'^[0-9]{8}-[0-9]{6}$'
+INLINE_REGEX = r'^(COMMAND_CHAR){1};.+'
 LOG_PATH = r'./../botlog'
 EFI_ID = 905200111
 HELP_OP = """Ido Moshe 2:

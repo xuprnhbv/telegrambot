@@ -9,6 +9,8 @@ import time
 import os
 import random
 
+chosen_meme = None
+
 
 def init_daily_meme(updater):
     """
@@ -16,25 +18,32 @@ def init_daily_meme(updater):
     :param updater: the bot's updater object
     """
     schedule.every().day.at(DAILY_MEME_HOUR).do(send_random_meme, updater=updater)
-
     while True:
         schedule.run_pending()
         time.sleep(1)
 
 
-def send_random_meme(updater: Updater):
+def send_random_meme(updater):
+    # type: (telegram.Updater) -> None
     """
     Chooses a random file from the videos folder and sends it to everyone who wants memes :)
     :param updater: the bot's updater object
     :return:
     """
+    global chosen_meme
     if len(os.listdir(MEMES_PATH)) == 0:
         logger.print_log('NO MEME TO SEND!!!!!')
         updater.bot.send_message(chat_id=MANAGEMENT_CHAT, text="NO MEME TO SEND! ADD A MEME AND USE /forcesend!!!!")
         return
 
-    logger.print_log('{text}Choosing daily meme...'.format(text=TEXT_COLOR))
-    meme = choose_random_meme()
+    if chosen_meme:
+        logger.print_log('{text}Meme {meme_name} was chosen beforehand! skipping random meme...'.format(
+            meme_name=chosen_meme, text=TEXT_COLOR))
+        meme = chosen_meme
+        chosen_meme = None
+    else:
+        logger.print_log('{text}Choosing daily meme...'.format(text=TEXT_COLOR))
+        meme = choose_random_meme()
     logger.print_log('{text}Chosen {green}{}{text}! Sending meme...'.format(meme, green=Fore.LIGHTGREEN_EX, text=TEXT_COLOR))
     meme_caption = BOKER_TOV + meme[16:-4]
     send_count = 0
@@ -80,3 +89,17 @@ def get_chat_list():
     chat_dict = _get_chats()
     return [int(i) for i in list(chat_dict.keys())]
 
+
+def choose_next_meme(filename):
+    # type: (str) -> None
+    global chosen_meme
+    chosen_meme = filename
+
+
+def is_next_meme_chosen():
+    return bool(get_chosen_meme())
+
+
+def get_chosen_meme():
+    global chosen_meme
+    return chosen_meme
