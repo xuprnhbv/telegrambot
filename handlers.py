@@ -253,7 +253,7 @@ def close_inline_menu(update, _):
 
 
 def chats_inline_menu(update, _):
-    update.callback_query.message.edit_text('Choose a chat to continue', reply_markup=chats_keyboard())
+    update.callback_query.message.edit_text('Not implemented yet!', reply_markup=chats_keyboard())
 
 
 def subscribe_inline(update, context):
@@ -416,4 +416,10 @@ def file_actions_keyboard(filename):
 
 
 def chats_keyboard():
-    return InlineKeyboardMarkup([[]])
+    return InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(text='Go back', callback_data='main_menu')
+            ]
+        ]
+    )
