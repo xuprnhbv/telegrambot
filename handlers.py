@@ -246,7 +246,7 @@ def file_actions_inline_menu(update, _):
 
 
 def close_inline_menu(update, _):
-    update.callback_query.message.edit_text('Goodbye!', reply_markup=None)
+    update.callback_query.message.delete()
 
 
 def chats_inline_menu(update, _):
@@ -329,6 +329,12 @@ def get_version_inline(update, _):
     update.callback_query.message.edit_text(f"Branch: {repo.active_branch.name}\nLast Commit Date: "
                                   f"{current_ver_date}\nCommit SHA: {current_ver_sha}",
                                             reply_markup=main_keyboard(update.effective_chat))
+
+
+def force_send_meme(update, context):
+    logger.print_log('{text}Force sending meme...'.format(text=TEXT_COLOR))
+    send_random_meme(context)
+    update.callback_query.message.edit_text('Force sent meme.')
 
 
 #### Keyboards ####
