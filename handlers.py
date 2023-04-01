@@ -230,7 +230,7 @@ def main_inline_menu(update, _):
     try:
         update.callback_query.message.edit_text('Choose an option to begin.',
                                                 reply_markup=main_keyboard(update.effective_chat))
-    except:
+    except AttributeError:
         update.message.reply_text('Choose an option to begin.', reply_markup=main_keyboard(update.effective_chat))
 
 
