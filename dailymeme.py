@@ -9,6 +9,8 @@ import time
 import os
 import random
 
+chosen_meme = None
+
 
 def init_daily_meme(updater):
     """
@@ -16,7 +18,6 @@ def init_daily_meme(updater):
     :param updater: the bot's updater object
     """
     schedule.every().day.at(DAILY_MEME_HOUR).do(send_random_meme, updater=updater)
-
     while True:
         schedule.run_pending()
         time.sleep(1)
@@ -33,8 +34,14 @@ def send_random_meme(updater: Updater):
         updater.bot.send_message(chat_id=MANAGEMENT_CHAT, text="NO MEME TO SEND! ADD A MEME AND USE /forcesend!!!!")
         return
 
-    logger.print_log('{text}Choosing daily meme...'.format(text=TEXT_COLOR))
-    meme = choose_random_meme()
+    if chosen_meme:
+        global chosen_meme
+        logger.print_log('{text}Meme {meme_name} was chosen beforehand! skipping random meme...'.format(chosen_meme, ))
+        meme = chosen_meme
+        chosen_meme = None
+    else:
+        logger.print_log('{text}Choosing daily meme...'.format(text=TEXT_COLOR))
+        meme = choose_random_meme()
     logger.print_log('{text}Chosen {green}{}{text}! Sending meme...'.format(meme, green=Fore.LIGHTGREEN_EX, text=TEXT_COLOR))
     meme_caption = BOKER_TOV + meme[16:-4]
     send_count = 0
