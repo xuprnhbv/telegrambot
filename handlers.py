@@ -473,11 +473,12 @@ def chats_keyboard():
 
 
 def chat_actions_keyboard(chat):
-    return InlineKeyboardMarkup([
+    keyboard = [
         [
-            InlineKeyboardButton(text='Kick', callback_data=f'chtkick;{chat}'),
+            InlineKeyboardButton(text='Kick', callback_data=f'chtkick;{chat}')
         ],
         [
             InlineKeyboardButton(text='Go Back', callback_data='chats_menu')
         ]
-    ])
+    ]
+    return InlineKeyboardMarkup(keyboard)
