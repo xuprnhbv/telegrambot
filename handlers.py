@@ -438,7 +438,7 @@ def _get_chosen_meme_buttons():
 
 def files_keyboard():
     keyboard = []
-    meme_dir = os.listdir(MEMES_PATH)
+    meme_dir = sorted(os.listdir(MEMES_PATH))
     row_length = 1
     for file_row in [meme_dir[i:i + row_length] for i in range(0, len(meme_dir), row_length)]:
         button_row = []
