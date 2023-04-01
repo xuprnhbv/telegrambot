@@ -261,6 +261,7 @@ def chats_inline_menu(update, _):
 
 
 def chat_actions_inline_menu(update, _):
+    logger.print_log('entering inline chats')
     chat_chosen = update.callback_query.data.split(';')[1]
     chats = _get_chats()
     update.callback_query.message.edit_text(f'Choose an action for chat {chats[chat_chosen]}',
