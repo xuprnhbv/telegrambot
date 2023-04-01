@@ -450,7 +450,7 @@ def chats_keyboard():
     with open(CHAT_IDS_PATH, 'r') as chat_file:
         chats = json.load(chat_file)
     row_length = 2
-    for chat_row in [chats.keys()[i:i + row_length] for i in range(0, len(chats.keys()), row_length)]:
+    for chat_row in [list(chats.keys())[i:i + row_length] for i in range(0, len(chats.keys()), row_length)]:
         row = []
         for chat in chat_row:
             row.append(InlineKeyboardButton(text=f"{chat} ({chats[chat]})", callback_data=f'cht;{chat}'))
