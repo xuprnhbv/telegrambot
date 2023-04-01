@@ -265,7 +265,6 @@ def chat_actions_inline_menu(update, _):
                                             reply_markup=chat_actions_keyboard(chat_chosen))
 
 
-
 def subscribe_inline(update, context):
     # Since we use inline, we can skip checking whether the user is subbed or not.
     chats = _get_chats()
