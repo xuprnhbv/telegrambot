@@ -11,3 +11,10 @@ it is built as follows:
 ->videos
 ->token.key
 ```
+
+## todo
+
+* proper context menu for managing the video directory (deleting etc) - (/managevids)
+* set video for next day's daily meme, instead of sending random meme (/thismeme)
+* IN SERVER manage periodic cron to automatically pull master branch!! (maybe even make /update_bot for self update?)
+* add explanation about memes for those who do not understand (/explainmeme for users, and /addexplanation for admin)
