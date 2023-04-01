@@ -223,8 +223,8 @@ def get_inline_handlers():
         CallbackQueryHandler(choose_next_meme_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'c')),
         CallbackQueryHandler(file_actions_inline_menu, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'f')),
         CallbackQueryHandler(force_send_now_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'fsn')),
-        CallbackQueryHandler(delete_meme_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'd')),
         CallbackQueryHandler(force_send_now_yn_inline, pattern="^(fsn@_@){1}((yes)|(no)){1}"),
+        CallbackQueryHandler(delete_meme_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'd')),
         CallbackQueryHandler(close_inline_menu, pattern='close'),
     ]
 
@@ -255,7 +255,15 @@ def close_inline_menu(update, _):
 
 
 def chats_inline_menu(update, _):
-    update.callback_query.message.edit_text('Not implemented yet!', reply_markup=chats_keyboard())
+    update.callback_query.message.edit_text(f'Chat list', reply_markup=chats_keyboard())
+
+
+def chat_actions_inline_menu(update, _):
+    chat_chosen = update.callback_query.data.split(';')[1]
+    chats = _get_chats()
+    update.callback_query.message.edit_text(f'Choose an action for chat {chats[chat_chosen]}',
+                                            reply_markup=chat_actions_keyboard(chat_chosen))
+
 
 
 def subscribe_inline(update, context):
@@ -275,7 +283,8 @@ def subscribe_inline(update, context):
         json.dump(chats, fd)
     # currently, this option is only accessible from the main menu, therefore we return to it. We recall the function
     # to change the button received from _get_proper_sub_button.
-    update.callback_query.message.edit_text('Successfully subscribed', reply_markup=main_keyboard(update.effective_chat))
+    update.callback_query.message.edit_text('Successfully subscribed',
+                                            reply_markup=main_keyboard(update.effective_chat))
     context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Added {update.effective_chat.type} to daily memes: "
                                                            f"{name} ({update.effective_chat.id})!!")
 
@@ -291,7 +300,8 @@ def unsubscribe_inline(update, context):
     name = update.effective_chat.username or update.effective_chat.title
     # currently, this option is only accessible from the main menu, therefore we return to it. We recall the function
     # to change the button received from _get_proper_sub_button.
-    update.callback_query.message.edit_text("Unsubscribed successfully", reply_markup=main_keyboard(update.effective_chat))
+    update.callback_query.message.edit_text("Unsubscribed successfully",
+                                            reply_markup=main_keyboard(update.effective_chat))
     context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Removed {name} from daily meme chats!!")
 
 
@@ -303,7 +313,8 @@ def force_send_now_inline(update, _):
     # yeah im lazy im doing this menu here. fuck you too!
     update.callback_query.message.edit_text(f"You sure you want to force send {meme_to_send} right now?",
                                             reply_markup=InlineKeyboardMarkup([[
-                                                InlineKeyboardButton('Yes', callback_data=f'fsn@_@yes@_@{meme_to_send}'),
+                                                InlineKeyboardButton('Yes',
+                                                                     callback_data=f'fsn@_@yes@_@{meme_to_send}'),
                                                 InlineKeyboardButton('No', callback_data=f'fsn@_@no@_@{meme_to_send}')
                                             ]]))
 
@@ -332,7 +343,7 @@ def get_version_inline(update, _):
     current_ver_date = time.ctime(repo.head.commit.committed_date)
     current_ver_sha = repo.head.commit.hexsha
     update.callback_query.message.edit_text(f"Branch: {repo.active_branch.name}\nLast Commit Date: "
-                                  f"{current_ver_date}\nCommit SHA: {current_ver_sha}",
+                                            f"{current_ver_date}\nCommit SHA: {current_ver_sha}",
                                             reply_markup=main_keyboard(update.effective_chat))
 
 
@@ -416,7 +427,7 @@ def files_keyboard():
     keyboard = []
     meme_dir = os.listdir(MEMES_PATH)
     row_length = 1
-    for file_row in [meme_dir[i:i+row_length] for i in range(0, len(meme_dir), row_length)]:
+    for file_row in [meme_dir[i:i + row_length] for i in range(0, len(meme_dir), row_length)]:
         button_row = []
         for file in file_row:
             button_row.append(InlineKeyboardButton(text=file, callback_data=f'f;{file}'))
@@ -435,10 +446,25 @@ def file_actions_keyboard(filename):
 
 
 def chats_keyboard():
-    return InlineKeyboardMarkup(
+    keyboard = []
+    with open(CHAT_IDS_PATH, 'r') as chat_file:
+        chats = json.load(chat_file)
+    row_length = 2
+    for chat_row in [chats.keys()[i:i + row_length] for i in range(0, len(chats.keys()), row_length)]:
+        row = []
+        for chat in chat_row:
+            row.append(InlineKeyboardButton(text=f"{chat} ({chats[chat]})", callback_data=f'cht;{chat}'))
+        keyboard.append(row)
+    keyboard.append([InlineKeyboardButton(text='Go back', callback_data='main_menu')])
+    return InlineKeyboardMarkup(keyboard)
+
+
+def chat_actions_keyboard(chat):
+    keyboard = InlineKeyboardMarkup([
         [
-            [
-                InlineKeyboardButton(text='Go back', callback_data='main_menu')
-            ]
+            InlineKeyboardButton(text='Kick', callback_data=f'chtkick;{chat}'),
+        ],
+        [
+            InlineKeyboardButton(text='Go Back', callback_data='chats_menu')
         ]
-    )
+    ])
