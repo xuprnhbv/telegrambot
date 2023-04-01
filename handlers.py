@@ -223,9 +223,9 @@ def get_inline_handlers():
         CallbackQueryHandler(choose_next_meme_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'c')),
         CallbackQueryHandler(file_actions_inline_menu, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'f')),
         CallbackQueryHandler(force_send_now_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'fsn')),
+        CallbackQueryHandler(delete_meme_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'd')),
         CallbackQueryHandler(force_send_now_yn_inline, pattern="^(fsn@_@){1}((yes)|(no)){1}"),
         CallbackQueryHandler(close_inline_menu, pattern='close'),
-        #CallbackQueryHandler(None, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'd'))
     ]
 
 
@@ -349,6 +349,23 @@ def show_next_meme(update, _):
 def reset_next_meme(update, _):
     choose_next_meme(None)
     update.callback_query.message.edit_text('Reset next meme', reply_markup=main_keyboard(update.effective_chat))
+
+
+def delete_meme_inline(update, _):
+    meme_to_delete = update.callback_query.data.split(';')[1]
+    if meme_to_delete not in os.listdir(MEMES_PATH):
+        update.callback_query.message.edit_text(f'Meme {meme_to_delete} is not a file!',
+                                                reply_markup=file_actions_keyboard(meme_to_delete))
+        return
+    try:
+        os.remove(os.path.join(MEMES_PATH, meme_to_delete))
+    finally:
+        if meme_to_delete not in os.listdir(MEMES_PATH):
+            update.callback_query.message.edit_text(f'Meme {meme_to_delete} was successfully deleted!',
+                                                    reply_markup=files_keyboard())
+        else:
+            update.callback_query.message.edit_text('Failed to delete :(',
+                                                    reply_markup=file_actions_keyboard(meme_to_delete))
 
 
 #### Keyboards ####
