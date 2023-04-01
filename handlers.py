@@ -220,7 +220,7 @@ def get_inline_handlers():
         CallbackQueryHandler(unsubscribe_inline, pattern='unsubscribe'),
         CallbackQueryHandler(file_actions_inline_menu, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'f')),
         CallbackQueryHandler(force_send_now_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'fsn')),
-        CallbackQueryHandler(force_send_now_yn_inline, pattern="^(fsn-){1}((yes)|(no)){1}"),
+        CallbackQueryHandler(force_send_now_yn_inline, pattern="^(fsn@_@){1}((yes)|(no)){1}"),
         CallbackQueryHandler(close_inline_menu, pattern='close'),
         #CallbackQueryHandler(None, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'd'))
     ]
@@ -298,13 +298,13 @@ def force_send_now_inline(update, _):
     # yeah im lazy im doing this menu here. fuck you too!
     update.callback_query.message.edit_text(f"You sure you want to force send {meme_to_send} right now?",
                                             reply_markup=InlineKeyboardMarkup([[
-                                                InlineKeyboardButton('Yes', callback_data=f'fsn-yes-{meme_to_send}'),
-                                                InlineKeyboardButton('No', callback_data=f'fsn-no-{meme_to_send}')
+                                                InlineKeyboardButton('Yes', callback_data=f'fsn@_@yes@_@{meme_to_send}'),
+                                                InlineKeyboardButton('No', callback_data=f'fsn@_@no@_@{meme_to_send}')
                                             ]]))
 
 
 def force_send_now_yn_inline(update, context):
-    answer, meme_to_send = update.callback_query.data.split('-')[1:3]
+    answer, meme_to_send = update.callback_query.data.split('@_@')[1:3]
     if answer == 'yes':
         choose_next_meme(meme_to_send)
         send_random_meme(context)
