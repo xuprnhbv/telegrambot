@@ -260,7 +260,7 @@ def subscribe_inline(update, context):
         update.callback_query.message.edit_text('You are subscribed already, somehow? Please contact Ido',
                                                 reply_markup=main_keyboard(update.effective_chat))
         logger.print_log(f'Chat {update.effective_chat.id} somehow managed to subscribe_inline while being subscribed.'
-                         f'Callback data: "{update.callback_query.callback_data}"')
+                         f'Callback data: "{update.callback_query.data}"')
         return
 
     name = update.effective_chat.username or update.effective_chat.title
@@ -291,7 +291,7 @@ def unsubscribe_inline(update, context):
 
 
 def force_send_now_inline(update, _):
-    meme_to_send = update.callback_query.callback_data.split(';')[1]
+    meme_to_send = update.callback_query.data.split(';')[1]
     if meme_to_send not in os.listdir(MEMES_PATH):
         update.callback_query.message.edit_text(f"File {meme_to_send} does not exist!", reply_markup=files_keyboard())
         return
@@ -304,7 +304,7 @@ def force_send_now_inline(update, _):
 
 
 def force_send_now_yn_inline(update, context):
-    answer, meme_to_send = update.callback_query.callback_data.split('-')[1:3]
+    answer, meme_to_send = update.callback_query.data.split('-')[1:3]
     if answer == 'yes':
         choose_next_meme(meme_to_send)
         send_random_meme(context)
@@ -316,7 +316,7 @@ def force_send_now_yn_inline(update, context):
 
 
 def choose_next_meme_inline(update, _):
-    meme_to_send = update.callback_query.callback_data.split(';')[1]
+    meme_to_send = update.callback_query.data.split(';')[1]
     choose_next_meme(meme_to_send)
     update.callback_query.message.edit_text(f"Next meme to be sent is {meme_to_send}",
                                             reply_markup=file_actions_keyboard(meme_to_send))
