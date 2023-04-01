@@ -94,3 +94,8 @@ def choose_next_meme(filename):
     # type: (str) -> None
     global chosen_meme
     chosen_meme = filename
+
+
+def is_next_meme_chosen():
+    global chosen_meme
+    return bool(chosen_meme)
