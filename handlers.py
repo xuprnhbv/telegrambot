@@ -214,7 +214,7 @@ def get_inline_handlers():
         CallbackQueryHandler(main_inline_menu, pattern='main_menu'),
         CallbackQueryHandler(files_inline_menu, pattern='files_menu'),
         CallbackQueryHandler(chats_inline_menu, pattern='chats_menu'),
-        CallbackQueryHandler(get_version, pattern='version'),
+        CallbackQueryHandler(get_version_inline, pattern='version'),
         CallbackQueryHandler(force_send_meme, pattern='force_send'),
         CallbackQueryHandler(subscribe_inline, pattern='subscribe'),
         CallbackQueryHandler(unsubscribe_inline, pattern='unsubscribe'),
@@ -254,7 +254,7 @@ def subscribe_inline(update, context):
     chats = _get_chats()
     if str(update.effective_chat.id) in chats.keys():
         update.callback_query.message.edit_text('You are subscribed already, somehow? Please contact Ido',
-                                                reply_markup=main_keyboard())
+                                                reply_markup=main_keyboard(update.effective_chat))
         logger.print_log(f'Chat {update.effective_chat.id} somehow managed to subscribe_inline while being subscribed.'
                          f'Callback data: "{update.callback_query.callback_data}"')
         return
@@ -266,7 +266,7 @@ def subscribe_inline(update, context):
         json.dump(chats, fd)
     # currently, this option is only accessible from the main menu, therefore we return to it. We recall the function
     # to change the button received from _get_proper_sub_button.
-    update.callback_query.message.edit_text('Successfully subscribed', reply_markup=main_keyboard())
+    update.callback_query.message.edit_text('Successfully subscribed', reply_markup=main_keyboard(update.effective_chat))
     context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Added {update.effective_chat.type} to daily memes: "
                                                            f"{name} ({update.effective_chat.id})!!")
 
@@ -282,7 +282,7 @@ def unsubscribe_inline(update, context):
     name = update.effective_chat.username or update.effective_chat.title
     # currently, this option is only accessible from the main menu, therefore we return to it. We recall the function
     # to change the button received from _get_proper_sub_button.
-    update.callback_query.message.edit_text("Unsubscribed successfully", reply_markup=main_keyboard())
+    update.callback_query.message.edit_text("Unsubscribed successfully", reply_markup=main_keyboard(update.effective_chat))
     context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Removed {name} from daily meme chats!!")
 
 
@@ -316,6 +316,15 @@ def choose_next_meme_inline(update, _):
     choose_next_meme(meme_to_send)
     update.callback_query.message.edit_text(f"Next meme to be sent is {meme_to_send}",
                                             reply_markup=file_actions_keyboard(meme_to_send))
+
+
+def get_version_inline(update, _):
+    repo = git.Repo(search_parent_directories=True)
+    current_ver_date = time.ctime(repo.head.commit.committed_date)
+    current_ver_sha = repo.head.commit.hexsha
+    update.callback_query.message.edit_text(f"Branch: {repo.active_branch.name}\nLast Commit Date: "
+                                  f"{current_ver_date}\nCommit SHA: {current_ver_sha}",
+                                            reply_markup=main_keyboard(update.effective_chat))
 
 
 #### Keyboards ####
