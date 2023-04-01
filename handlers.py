@@ -1,18 +1,17 @@
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
-from telegram import constants, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler, Dispatcher
+from telegram import constants, InlineKeyboardButton, InlineKeyboardMarkup, Chat, Update
 from colorama import Fore
 from .files import download_meme, delete_meme, MEMES_PATH
-from .dailymeme import send_random_meme
+from .dailymeme import send_random_meme, choose_next_meme, get_chat_list
 from .chats import _get_chats
-from .consts import TEXT_COLOR, MANAGEMENT_CHAT, DATE_REGEX, EFI_ID, CHAT_IDS_PATH, HELP_OP, MANAGEMENT_HELP_OP
+from .consts import TEXT_COLOR, MANAGEMENT_CHAT, DATE_REGEX, EFI_ID, CHAT_IDS_PATH, HELP_OP, MANAGEMENT_HELP_OP, \
+    INLINE_REGEX
 import logger
 import re
 import os
 import git
 import time
 import json
-
-DATE_REGEX = r'^[0-9]{8}-[0-9]{6}$'
 
 
 def add_all_handlers(updater: Updater):
@@ -165,8 +164,7 @@ def subscribe_to_memes(update, context):
         context.bot.send_message(chat_id=update.effective_chat.id, text="You're already subscribed!")
         return
 
-    name = update.effective_chat.username if update.effective_chat.type == "private" \
-        else update.effective_chat.title
+    name = update.effective_chat.username or update.effective_chat.title
 
     chats.update({update.effective_chat.id: name})
     with open(CHAT_IDS_PATH, 'w') as fd:
@@ -185,8 +183,7 @@ def unsubscribe_to_memes(update, context):
     chats.pop(str(update.effective_chat.id))
     with open(CHAT_IDS_PATH, 'w') as fd:
         json.dump(chats, fd)
-    name = update.effective_chat.username if update.effective_chat.type == "private" \
-        else update.effective_chat.title
+    name = update.effective_chat.username or update.effective_chat.title
     context.bot.send_message(chat_id=update.effective_chat.id, text="Unsubscribed successfully")
     context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Removed {name} from "
                                                            f"daily meme chats")
@@ -212,70 +209,161 @@ def kick_from_memes(update, context):
 
 #### Handler Initiation ####
 def get_inline_handlers():
-    return {
+    return [
         CommandHandler('start', main_inline_menu),
         CallbackQueryHandler(main_inline_menu, pattern='main_menu'),
-        CallbackQueryHandler(files_inline_menu, pattern='files_menu')
-    }
+        CallbackQueryHandler(files_inline_menu, pattern='files_menu'),
+        CallbackQueryHandler(chats_inline_menu, pattern='chats_menu'),
+        CallbackQueryHandler(get_version, pattern='version'),
+        CallbackQueryHandler(force_send_meme, pattern='force_send'),
+        CallbackQueryHandler(subscribe_inline, pattern='subscribe'),
+        CallbackQueryHandler(unsubscribe_inline, pattern='unsubscribe'),
+        CallbackQueryHandler(file_actions_inline_menu, pattern=INLINE_REGEX.format('f')),
+        CallbackQueryHandler(force_send_now_inline, pattern=INLINE_REGEX.format('fsn')),
+        CallbackQueryHandler(force_send_now_yn_inline, pattern="^(fsn-){1}((yes)|(no)){1}"),
+        CallbackQueryHandler(None, pattern=INLINE_REGEX.format('d'))
+    ]
 
 
 #### Bot ####
-def main_inline_menu(update, context):
-    #  type: (telegram.Update, telegram.ext.Dispatcher) -> None
+def main_inline_menu(update, _):
     update.message.reply_text('Choose an option to begin.', reply_markup=main_keyboard())
 
 
 def files_inline_menu(update, context):
-    #  type: (telegram.Update, telegram.ext.Dispatcher) -> None
-    update.callback_query.message.edit_text('Choose a file to begin.', reply_markup=files_keyboard())
+    update.callback_query.message.edit_text('Choose a file to continue', reply_markup=files_keyboard())
 
 
-def inline_menu_file_context(update, context):
-    update.callback_query.message.edit_text(f'Chose {update.callback_query.data}. Choose an action or go back.')
+def file_actions_inline_menu(update, _):
+    file_chosen = update.callback_query.callback_data.split(';')[1]
+    update.callback_query.message.edit_text(f'Chose {file_chosen}. Choose an action or go back.',
+                                            reply_markup=file_actions_keyboard(file_chosen))
+
+
+def close_inline_menu(update, _):
+    update.callback_query.message.edit_text('Goodbye!', reply_markup=None)
+
+
+def chats_inline_menu(update, _):
+    update.callback_query.message.edit_text('Choose a chat to continue', reply_markup=chats_keyboard())
+
+
+def subscribe_inline(update, context):
+    # Since we use inline, we can skip checking whether the user is subbed or not.
+    chats = _get_chats()
+    if str(update.effective_chat.id) in chats.keys():
+        update.callback_query.message.edit_text('You are subscribed already, somehow? Please contact Ido',
+                                                reply_markup=main_keyboard())
+        logger.print_log(f'Chat {update.effective_chat.id} somehow managed to subscribe_inline while being subscribed.'
+                         f'Callback data: "{update.callback_query.callback_data}"')
+        return
+
+    name = update.effective_chat.username or update.effective_chat.title
+
+    chats.update({update.effective_chat.id: name})
+    with open(CHAT_IDS_PATH, 'w') as fd:
+        json.dump(chats, fd)
+    # currently, this option is only accessible from the main menu, therefore we return to it. We recall the function
+    # to change the button received from _get_proper_sub_button.
+    update.callback_query.message.edit_text('Successfully subscribed', reply_markup=main_keyboard())
+    context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Added {update.effective_chat.type} to daily memes: "
+                                                           f"{name} ({update.effective_chat.id})!!")
+
+
+def unsubscribe_inline(update, context):
+    chats = _get_chats()
+    if str(update.effective_chat.id) not in chats.keys():
+        update.callback_query.message.edit_text('You are not subscribed, somehow? Please contact Ido')
+        return
+    chats.pop(str(update.effective_chat.id))
+    with open(CHAT_IDS_PATH, 'w') as fd:
+        json.dump(chats, fd)
+    name = update.effective_chat.username or update.effective_chat.title
+    # currently, this option is only accessible from the main menu, therefore we return to it. We recall the function
+    # to change the button received from _get_proper_sub_button.
+    update.callback_query.message.edit_text("Unsubscribed successfully", reply_markup=main_keyboard())
+    context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Removed {name} from daily meme chats!!")
+
+
+def force_send_now_inline(update, _):
+    meme_to_send = update.callback_query.callback_data.split(';')[1]
+    if meme_to_send not in os.listdir(MEMES_PATH):
+        update.callback_query.message.edit_text(f"File {meme_to_send} does not exist!", reply_markup=files_keyboard())
+        return
+    # yeah im lazy im doing this menu here. fuck you too!
+    update.callback_query.message.edit_text(f"You sure you want to force send {meme_to_send} right now?",
+                                            reply_markup=InlineKeyboardMarkup([[
+                                                InlineKeyboardButton('Yes', callback_data=f'fsn-yes-{meme_to_send}'),
+                                                InlineKeyboardButton('No', callback_data=f'fsn-no-{meme_to_send}')
+                                            ]]))
+
+
+def force_send_now_yn_inline(update, context):
+    answer, meme_to_send = update.callback_query.callback_data.split('-')[1:3]
+    if answer == 'yes':
+        choose_next_meme(meme_to_send)
+        send_random_meme(context)
+        # we return to files menu because the current file is deleted!
+        update.callback_query.message.edit_text(f'Sent meme {meme_to_send}. Returned to files menu'
+                                                , reply_markup=files_keyboard())
+    else:
+        update.callback_query.message.edit_text('Did not send meme.', reply_markup=file_actions_keyboard(meme_to_send))
+
+
+def choose_next_meme_inline(update, _):
+    meme_to_send = update.callback_query.callback_data.split(';')[1]
+    choose_next_meme(meme_to_send)
+    update.callback_query.message.edit_text(f"Next meme to be sent is {meme_to_send}",
+                                            reply_markup=file_actions_keyboard(meme_to_send))
 
 
 #### Keyboards ####
 def main_keyboard(calling_chat):
-    #  type: (telegram.Chat) -> list[InlineKeyboardButton]
     """
     Opens up the main keyboard
-    :param is_admin: True if in admin chat, for additional options.
+    :param calling_chat: the chat that this was called from. used to determine whether to show 'subscribe' or
+    'unsubscribe'
     :return: inline keyboard
     """
     keyboard = [
-        _get_proper_sub_button(calling_chat),
+        [_get_proper_sub_button(calling_chat)]
     ]  # General keyboard for all users
     if calling_chat.id == MANAGEMENT_CHAT:
         keyboard += [
-            InlineKeyboardButton(text="Memes", callback_data='files_menu'),
-            InlineKeyboardButton(text="Chats", callback_data='chats_menu'),
-            InlineKeyboardButton(text="Version", callback_data='version'),
-            InlineKeyboardButton(text="Force Send", callback_data="force_send")
+            [InlineKeyboardButton(text="Memes", callback_data='files_menu'),
+             InlineKeyboardButton(text="Chats", callback_data='chats_menu')],
+            [InlineKeyboardButton(text="Version", callback_data='version'),
+             InlineKeyboardButton(text="Force Send", callback_data="force_send")]
         ]  # Admin keyboard
-    keyboard.append(InlineKeyboardButton("Close", callback_data='close'))
-    return keyboard
+    keyboard.append([InlineKeyboardButton("Close", callback_data='close')])
+    return InlineKeyboardMarkup(keyboard)
 
 
 def _get_proper_sub_button(calling_chat):
-    #  type: (telegram.Chat) -> InlineKeyboardButton
-    return InlineKeyboardButton('Unsubscribe', callback_data='unsubscribe') if calling_chat.id in _get_chats().keys() \
+    return InlineKeyboardButton('Unsubscribe', callback_data='unsubscribe') if calling_chat.id in get_chat_list() \
         else InlineKeyboardButton("Subscribe", callback_data='subscribe')
 
 
 def files_keyboard():
     keyboard = []
     meme_dir = os.listdir(MEMES_PATH)
-    for meme in meme_dir:
-        keyboard.append(InlineKeyboardButton(text=meme, callback_data=meme))
-    keyboard.append(InlineKeyboardButton(text="Go Back", callback_data='main_menu'))
-    return keyboard
+    for file_row in [meme_dir[i:i+2] for i in range(0, len(meme_dir, 2))]:
+        button_row = []
+        for file in file_row:
+            button_row.append(InlineKeyboardButton(text=file, callback_data=f'f;{file}'))
+        keyboard.append(button_row)
+    keyboard.append([InlineKeyboardButton(text="Go Back", callback_data='main_menu')])
+    return InlineKeyboardMarkup(keyboard)
 
 
 def file_actions_keyboard(filename):
-    return [
-        InlineKeyboardButton(text='Send Next', callback_data=f'c;{filename}'),  # c -> Chosen meme for next send
-        InlineKeyboardButton(text='Send Now', callback_data=f'fsn;{filename}'),  # fsn -> force send now.
-        InlineKeyboardButton(text='Delete', callback_data=f'd;{filename}'),  # d -> delete this meme
-        InlineKeyboardButton(text='Go back', callback_data='inline_main')  # go back to files menu
-    ]
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton(text='Send Next', callback_data=f'c;{filename}'),  # c -> Chosen meme for next send
+         InlineKeyboardButton(text='Send Now', callback_data=f'fsn;{filename}')],  # fsn -> force send now.
+        [InlineKeyboardButton(text='Delete', callback_data=f'd;{filename}'),  # d -> delete this meme
+         InlineKeyboardButton(text='Go Back', callback_data='files_menu')]  # go back to files menu
+    ])
 
+
+def chats_keyboard():
+    return InlineKeyboardMarkup([[]])

@@ -23,7 +23,8 @@ def init_daily_meme(updater):
         time.sleep(1)
 
 
-def send_random_meme(updater: Updater):
+def send_random_meme(updater):
+    # type: (telegram.Updater) -> None
     """
     Chooses a random file from the videos folder and sends it to everyone who wants memes :)
     :param updater: the bot's updater object
@@ -87,3 +88,8 @@ def get_chat_list():
     chat_dict = _get_chats()
     return [int(i) for i in list(chat_dict.keys())]
 
+
+def choose_next_meme(filename):
+    # type: (str) -> None
+    global chosen_meme
+    chosen_meme = filename
