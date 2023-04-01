@@ -97,5 +97,9 @@ def choose_next_meme(filename):
 
 
 def is_next_meme_chosen():
+    return bool(get_chosen_meme())
+
+
+def get_chosen_meme():
     global chosen_meme
-    return bool(chosen_meme)
+    return chosen_meme

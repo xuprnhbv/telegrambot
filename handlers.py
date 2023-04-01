@@ -2,7 +2,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 from telegram import constants, InlineKeyboardButton, InlineKeyboardMarkup, Chat, Update
 from colorama import Fore
 from files import download_meme, delete_meme, MEMES_PATH
-from dailymeme import chosen_meme, send_random_meme, choose_next_meme, get_chat_list
+from dailymeme import send_random_meme, choose_next_meme, get_chat_list, is_next_meme_chosen, get_chosen_meme
 from chats import _get_chats
 from consts import TEXT_COLOR, MANAGEMENT_CHAT, DATE_REGEX, EFI_ID, CHAT_IDS_PATH, HELP_OP, MANAGEMENT_HELP_OP, \
     INLINE_REGEX
@@ -218,6 +218,8 @@ def get_inline_handlers():
         CallbackQueryHandler(force_send_meme, pattern='force_send'),
         CallbackQueryHandler(subscribe_inline, pattern='subscribe'),
         CallbackQueryHandler(unsubscribe_inline, pattern='unsubscribe'),
+        CallbackQueryHandler(show_next_meme, pattern='show-next-meme'),
+        CallbackQueryHandler(reset_next_meme, pattern='reset-next-meme'),
         CallbackQueryHandler(choose_next_meme_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'c')),
         CallbackQueryHandler(file_actions_inline_menu, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'f')),
         CallbackQueryHandler(force_send_now_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'fsn')),
@@ -338,6 +340,16 @@ def force_send_meme(update, context):
     update.callback_query.message.edit_text('Force sent meme.')
 
 
+def show_next_meme(update, _):
+    next_meme = get_chosen_meme()
+    update.callback_query.message.edit_text(f'Next meme is {next_meme}')
+
+
+def reset_next_meme(update, _):
+    choose_next_meme(None)
+    update.callback_query.message.edit_text('Reset next meme', reply_markup=main_keyboard(update.effective_chat))
+
+
 #### Keyboards ####
 def main_keyboard(calling_chat):
     """
@@ -356,6 +368,7 @@ def main_keyboard(calling_chat):
             [InlineKeyboardButton(text="Version", callback_data='version'),
              InlineKeyboardButton(text="Force Send", callback_data="force_send")]
         ]  # Admin keyboard
+        keyboard.append(_get_chosen_meme_buttons())
     keyboard.append([InlineKeyboardButton("Close", callback_data='close')])
     return InlineKeyboardMarkup(keyboard)
 
@@ -363,6 +376,20 @@ def main_keyboard(calling_chat):
 def _get_proper_sub_button(calling_chat):
     return InlineKeyboardButton('Unsubscribe', callback_data='unsubscribe') if calling_chat.id in get_chat_list() \
         else InlineKeyboardButton("Subscribe", callback_data='subscribe')
+
+
+def _get_chosen_meme_buttons():
+    """
+    returns buttons depending on whether or not next meme is chosen
+    :return: List of buttons to concat to admin buttons as 1 row
+    """
+    if is_next_meme_chosen():
+        return [
+            InlineKeyboardButton('Show Next', callback_data='show-next-meme'),
+            InlineKeyboardButton("Reset Next", callback_data='reset-next-meme'),
+        ]
+    else:
+        return []
 
 
 def files_keyboard():
