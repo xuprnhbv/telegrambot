@@ -368,7 +368,8 @@ def _get_proper_sub_button(calling_chat):
 def files_keyboard():
     keyboard = []
     meme_dir = os.listdir(MEMES_PATH)
-    for file_row in [meme_dir[i:i+2] for i in range(0, len(meme_dir), 2)]:
+    row_length = 1
+    for file_row in [meme_dir[i:i+row_length] for i in range(0, len(meme_dir), row_length)]:
         button_row = []
         for file in file_row:
             button_row.append(InlineKeyboardButton(text=file, callback_data=f'f;{file}'))
