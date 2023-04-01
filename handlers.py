@@ -218,6 +218,7 @@ def get_inline_handlers():
         CallbackQueryHandler(force_send_meme, pattern='force_send'),
         CallbackQueryHandler(subscribe_inline, pattern='subscribe'),
         CallbackQueryHandler(unsubscribe_inline, pattern='unsubscribe'),
+        CallbackQueryHandler(choose_next_meme_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'c')),
         CallbackQueryHandler(file_actions_inline_menu, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'f')),
         CallbackQueryHandler(force_send_now_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'fsn')),
         CallbackQueryHandler(force_send_now_yn_inline, pattern="^(fsn@_@){1}((yes)|(no)){1}"),
