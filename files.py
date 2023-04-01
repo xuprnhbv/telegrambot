@@ -1,5 +1,5 @@
 from telegram import File
-from consts import MEMES_PATH
+from .consts import MEMES_PATH
 import time
 import os
 
