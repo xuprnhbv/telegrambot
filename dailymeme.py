@@ -37,7 +37,8 @@ def send_random_meme(updater):
         return
 
     if chosen_meme:
-        logger.print_log('{text}Meme {meme_name} was chosen beforehand! skipping random meme...'.format(chosen_meme, ))
+        logger.print_log('{text}Meme {meme_name} was chosen beforehand! skipping random meme...'.format(
+            chosen_meme, text=TEXT_COLOR))
         meme = chosen_meme
         chosen_meme = None
     else:
