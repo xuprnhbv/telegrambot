@@ -212,16 +212,16 @@ def get_inline_handlers():
     return [
         CommandHandler('start', main_inline_menu),
         CallbackQueryHandler(main_inline_menu, pattern='main_menu'),
-        CallbackQueryHandler(files_inline_menu, pattern='files_menu'),
-        CallbackQueryHandler(chats_inline_menu, pattern='chats_menu'),
-        CallbackQueryHandler(get_version, pattern='version'),
-        CallbackQueryHandler(force_send_meme, pattern='force_send'),
+        CallbackQueryHandler(files_inline_menu, pattern='files_menu', filters=Filters.chat(MANAGEMENT_CHAT)),
+        CallbackQueryHandler(chats_inline_menu, pattern='chats_menu', filters=Filters.chat(MANAGEMENT_CHAT)),
+        CallbackQueryHandler(get_version, pattern='version', filters=Filters.chat(MANAGEMENT_CHAT)),
+        CallbackQueryHandler(force_send_meme, pattern='force_send', filters=Filters.chat(MANAGEMENT_CHAT)),
         CallbackQueryHandler(subscribe_inline, pattern='subscribe'),
         CallbackQueryHandler(unsubscribe_inline, pattern='unsubscribe'),
-        CallbackQueryHandler(file_actions_inline_menu, pattern=INLINE_REGEX.format('f')),
-        CallbackQueryHandler(force_send_now_inline, pattern=INLINE_REGEX.format('fsn')),
-        CallbackQueryHandler(force_send_now_yn_inline, pattern="^(fsn-){1}((yes)|(no)){1}"),
-        CallbackQueryHandler(None, pattern=INLINE_REGEX.format('d'))
+        CallbackQueryHandler(file_actions_inline_menu, pattern=INLINE_REGEX.format('f'), filters=Filters.chat(MANAGEMENT_CHAT)),
+        CallbackQueryHandler(force_send_now_inline, pattern=INLINE_REGEX.format('fsn'), filters=Filters.chat(MANAGEMENT_CHAT)),
+        CallbackQueryHandler(force_send_now_yn_inline, pattern="^(fsn-){1}((yes)|(no)){1}", filters=Filters.chat(MANAGEMENT_CHAT)),
+        #CallbackQueryHandler(None, pattern=INLINE_REGEX.format('d'), filters=Filters.chat(MANAGEMENT_CHAT))
     ]
 
 
