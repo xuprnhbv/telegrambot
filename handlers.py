@@ -227,8 +227,11 @@ def get_inline_handlers():
 
 #### Bot ####
 def main_inline_menu(update, _):
-    update.callback_query.message.edit_text('Choose an option to begin.',
-                                            reply_markup=main_keyboard(update.effective_chat))
+    if update.callback_query.message:
+        update.callback_query.message.edit_text('Choose an option to begin.',
+                                                reply_markup=main_keyboard(update.effective_chat))
+    else:
+        update.message.reply_text('Choose an option to begin.', reply_markup=main_keyboard(update.effective_chat))
 
 
 def files_inline_menu(update, context):
