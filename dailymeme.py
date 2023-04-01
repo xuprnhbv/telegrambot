@@ -30,13 +30,13 @@ def send_random_meme(updater):
     :param updater: the bot's updater object
     :return:
     """
+    global chosen_meme
     if len(os.listdir(MEMES_PATH)) == 0:
         logger.print_log('NO MEME TO SEND!!!!!')
         updater.bot.send_message(chat_id=MANAGEMENT_CHAT, text="NO MEME TO SEND! ADD A MEME AND USE /forcesend!!!!")
         return
 
     if chosen_meme:
-        global chosen_meme
         logger.print_log('{text}Meme {meme_name} was chosen beforehand! skipping random meme...'.format(chosen_meme, ))
         meme = chosen_meme
         chosen_meme = None
