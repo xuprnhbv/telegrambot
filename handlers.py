@@ -226,6 +226,7 @@ def get_inline_handlers():
         CallbackQueryHandler(force_send_now_yn_inline, pattern="^(fsn@_@){1}((yes)|(no)){1}"),
         CallbackQueryHandler(chat_actions_inline_menu, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'cht')),
         CallbackQueryHandler(delete_meme_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'd')),
+        CallbackQueryHandler(kick_chat_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'chtkick')),
         CallbackQueryHandler(close_inline_menu, pattern='close'),
     ]
 
@@ -381,6 +382,18 @@ def delete_meme_inline(update, _):
                                                     reply_markup=file_actions_keyboard(meme_to_delete))
 
 
+def kick_chat_inline(update, _):
+    rmchat_id = update.callback_query.data.split(';')[1]
+    chats = _get_chats()
+    if rmchat_id not in chats.keys():
+        update.callback_query.message.edit_text('Not a valid subbed chat', reply_markup=chats_keyboard())
+        return
+    chats.pop(rmchat_id)
+    with open(CHAT_IDS_PATH, 'w') as fd:
+        json.dump(chats, fd)
+    update.callback_query.message.edit_text(f'Removed chat {rmchat_id}', reply_markup=chats_keyboard())
+
+
 #### Keyboards ####
 def main_keyboard(calling_chat):
     """
@@ -460,7 +473,7 @@ def chats_keyboard():
 
 
 def chat_actions_keyboard(chat):
-    keyboard = InlineKeyboardMarkup([
+    return InlineKeyboardMarkup([
         [
             InlineKeyboardButton(text='Kick', callback_data=f'chtkick;{chat}'),
         ],
