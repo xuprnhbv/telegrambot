@@ -215,7 +215,7 @@ def get_inline_handlers():
         CallbackQueryHandler(files_inline_menu, pattern='files_menu'),
         CallbackQueryHandler(chats_inline_menu, pattern='chats_menu'),
         CallbackQueryHandler(get_version_inline, pattern='version'),
-        CallbackQueryHandler(force_send_meme, pattern='force_send'),
+        CallbackQueryHandler(force_send_now_inline, pattern='force_send'),
         CallbackQueryHandler(subscribe_inline, pattern='subscribe'),
         CallbackQueryHandler(unsubscribe_inline, pattern='unsubscribe'),
         CallbackQueryHandler(show_next_meme, pattern='show-next-meme'),
@@ -307,16 +307,21 @@ def unsubscribe_inline(update, context):
 
 
 def force_send_now_inline(update, _):
-    meme_to_send = update.callback_query.data.split(';')[1]
-    if meme_to_send not in os.listdir(MEMES_PATH):
+    if update.callback_query.data == 'force_send':
+        meme_to_send = None  # its none so we randomize
+    else:
+        meme_to_send = update.callback_query.data.split(';')[1]
+    if meme_to_send and meme_to_send not in os.listdir(MEMES_PATH):
         update.callback_query.message.edit_text(f"File {meme_to_send} does not exist!", reply_markup=files_keyboard())
         return
     # yeah im lazy im doing this menu here. fuck you too!
-    update.callback_query.message.edit_text(f"You sure you want to force send {meme_to_send} right now?",
+    message = f"You sure you want to force send {meme_to_send} right now?" if meme_to_send else "Force send right now?"
+    update.callback_query.message.edit_text(message,
                                             reply_markup=InlineKeyboardMarkup([[
                                                 InlineKeyboardButton('Yes',
                                                                      callback_data=f'fsn@_@yes@_@{meme_to_send}'),
-                                                InlineKeyboardButton('No', callback_data=f'fsn@_@no@_@{meme_to_send}')
+                                                InlineKeyboardButton('No', callback_data=f'fsn@_@no@_@{meme_to_send}' if
+                                                                     meme_to_send else "main_menu")
                                             ]]))
 
 
