@@ -320,7 +320,8 @@ def force_send_now_inline(update, _):
                                             reply_markup=InlineKeyboardMarkup([[
                                                 InlineKeyboardButton('Yes',
                                                                      callback_data=f'fsn@_@yes@_@{meme_to_send}'),
-                                                InlineKeyboardButton('No', callback_data=f'fsn@_@no@_@{meme_to_send}')
+                                                InlineKeyboardButton('No', callback_data=f'fsn@_@no@_@{meme_to_send}' if
+                                                                     meme_to_send else "main_menu")
                                             ]]))
 
 
