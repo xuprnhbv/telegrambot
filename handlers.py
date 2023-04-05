@@ -234,10 +234,10 @@ def get_inline_handlers():
 #### Bot ####
 def main_inline_menu(update, _):
     try:
-        update.callback_query.message.edit_text(f'Choose an option to begin, {update.message.from_user.username}.',
+        update.callback_query.message.edit_text(f'Choose an option to begin, {update.effective_message.from_user.username}.',
                                                 reply_markup=main_keyboard(update.effective_chat))
     except AttributeError:
-        update.message.reply_text(f'Choose an option to begin, {update.message.from_user.username}.',
+        update.message.reply_text(f'Choose an option to begin, {update.effective_message.from_user.username}.',
                                   reply_markup=main_keyboard(update.effective_chat))
 
 
