@@ -253,6 +253,7 @@ def file_actions_inline_menu(update, _):
 
 
 def close_inline_menu(update, _):
+    update.message.delete()
     update.callback_query.message.delete()
 
 
