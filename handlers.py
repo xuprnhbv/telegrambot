@@ -255,7 +255,6 @@ def file_actions_inline_menu(update, _):
 
 def close_inline_menu(update, _):
     update.callback_query.message.delete()
-    update.message.delete()
 
 
 def chats_inline_menu(update, _):
