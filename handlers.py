@@ -237,8 +237,8 @@ def main_inline_menu(update, _):
         update.callback_query.message.edit_text('Choose an option to begin.',
                                                 reply_markup=main_keyboard(update.effective_chat))
     except AttributeError:
-        update.message.delete()
         update.message.reply_text('Choose an option to begin.', reply_markup=main_keyboard(update.effective_chat))
+        update.message.delete()
 
 
 def files_inline_menu(update, context):
