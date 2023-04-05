@@ -239,7 +239,7 @@ def main_inline_menu(update, _):
     except AttributeError:
         update.message.reply_text(f'Choose an option to begin, {update.effective_message.from_user.username}.',
                                   reply_markup=main_keyboard(update.effective_chat))
-        update.message.delete()
+        update.message.delete()  # worse case it'll fail.
 
 
 def files_inline_menu(update, context):
