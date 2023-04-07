@@ -116,7 +116,7 @@ def files_inline_menu(update, context):
 def file_actions_inline_menu(update, _):
     file_chosen = update.callback_query.data.split(';')[1]
     update.callback_query.message.edit_text(f'Chose {file_chosen}. Choose an action or go back.',
-                                            reply_markup=file_actions_keyboard(file_chosen))
+                                            reply_markup=file_actions_keyboard(file_chosen), video=None)
 
 
 def close_inline_menu(update, _):
@@ -266,6 +266,17 @@ def kick_chat_inline(update, _):
     update.callback_query.message.edit_text(f'Removed chat {rmchat_id}', reply_markup=chats_keyboard())
 
 
+def show_meme_inline(update, _):
+    meme_to_show = update.callback_query.data.split(';')[1]
+    meme_path = os.path.join(MEMES_PATH, meme_to_show)
+    if not os.path.isfile(meme_path):
+        update.callback_query.message.edit_text(f"No such file!", reply_markup=files_keyboard())
+    else:
+        with open(meme_path, 'rb') as f:
+            update.callback_query.message.edit_text(f"Showing meme {meme_to_show}", video=f,
+                                                    reply_markup=file_actions_keyboard(meme_to_show))
+
+
 #### Keyboards ####
 def main_keyboard(calling_chat):
     """
@@ -326,7 +337,8 @@ def file_actions_keyboard(filename):
         [InlineKeyboardButton(text='Send Next', callback_data=f'c;{filename}'),  # c -> Chosen meme for next send
          InlineKeyboardButton(text='Send Now', callback_data=f'fsn;{filename}')],  # fsn -> force send now.
         [InlineKeyboardButton(text='Delete', callback_data=f'd;{filename}'),  # d -> delete this meme
-         InlineKeyboardButton(text='Go Back', callback_data='files_menu')]  # go back to files menu
+         InlineKeyboardButton(text='Show', callback_data=f'shw;{filename}')],  # shw -> show meme
+        [InlineKeyboardButton(text='Go Back', callback_data='files_menu')]  # go back to files menu
     ])
 
 
