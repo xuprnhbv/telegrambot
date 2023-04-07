@@ -275,7 +275,7 @@ def show_meme_inline(update, _):
         update.callback_query.message.edit_text(f"No such file!", reply_markup=files_keyboard())
     else:
         with open(meme_path, 'rb') as f:
-            update.callback_query.message.edit_media(video=f)
+            update.callback_query.message.edit_media(f)
             update.callback_query.message.edit_text(f"Showing meme {meme_to_show}",
                                                     reply_markup=file_actions_keyboard(meme_to_show))
 
