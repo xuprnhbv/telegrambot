@@ -118,7 +118,6 @@ def file_actions_inline_menu(update, _):
     file_chosen = update.callback_query.data.split(';')[1]
     update.callback_query.message.edit_text(f'Chose {file_chosen}. Choose an action or go back.',
                                             reply_markup=file_actions_keyboard(file_chosen))
-    update.callback_query.message.edit_media(video=None)
 
 
 def close_inline_menu(update, _):
