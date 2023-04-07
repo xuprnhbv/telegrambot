@@ -230,7 +230,8 @@ def force_send_meme(update, context):
 
 def show_next_meme(update, _):
     next_meme = get_chosen_meme()
-    update.callback_query.message.edit_text(f'Next meme is {next_meme}',
+    right_now = time.asctime()
+    update.callback_query.message.edit_text(f'Next meme is {next_meme} ({right_now})',
                                             reply_markup=main_keyboard(update.effective_chat))
 
 
@@ -275,7 +276,7 @@ def show_meme_inline(update, _):
         update.callback_query.message.edit_text(f"No such file!", reply_markup=files_keyboard())
     else:
         with open(meme_path, 'rb') as f:
-            update.callback_query.message.edit_text(f"Showing meme {meme_to_show}",
+            update.callback_query.message.edit_text(f"Showing meme {meme_to_show}.",
                                                     reply_markup=file_actions_keyboard(meme_to_show))
             update.callback_query.message.reply_video(video=f, reply_markup=InlineKeyboardMarkup([
                 [InlineKeyboardButton(text='Close', callback_data='close')]
