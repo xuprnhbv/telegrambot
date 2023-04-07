@@ -231,7 +231,7 @@ def force_send_meme(update, context):
 def show_next_meme(update, _):
     next_meme = get_chosen_meme()
     right_now = time.asctime()
-    update.callback_query.message.edit_text(f'Next meme is {next_meme} ({right_now})',
+    update.callback_query.message.edit_text(f'Next meme is {next_meme}',
                                             reply_markup=main_keyboard(update.effective_chat))
 
 
