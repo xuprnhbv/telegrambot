@@ -88,6 +88,7 @@ def get_inline_handlers():
         CallbackQueryHandler(choose_next_meme_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'c')),
         CallbackQueryHandler(file_actions_inline_menu, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'f')),
         CallbackQueryHandler(force_send_now_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'fsn')),
+        CallbackQueryHandler(show_meme_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'shw')),
         CallbackQueryHandler(force_send_now_yn_inline, pattern="^(fsn@_@){1}((yes)|(no)){1}"),
         CallbackQueryHandler(delete_meme_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'd')),
         CallbackQueryHandler(kick_chat_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'chtkick')),
@@ -208,7 +209,7 @@ def choose_next_meme_inline(update, _):
     meme_to_send = update.callback_query.data.split(';')[1]
     choose_next_meme(meme_to_send)
     update.callback_query.message.edit_text(f"Next meme to be sent is {meme_to_send}",
-                                            reply_markup=files_keyboard())
+                                            reply_markup=file_actions_keyboard(meme_to_send))
 
 
 def get_version_inline(update, _):
@@ -264,6 +265,21 @@ def kick_chat_inline(update, _):
     with open(CHAT_IDS_PATH, 'w') as fd:
         json.dump(chats, fd)
     update.callback_query.message.edit_text(f'Removed chat {rmchat_id}', reply_markup=chats_keyboard())
+
+
+def show_meme_inline(update, _):
+    meme_to_show = update.callback_query.data.split(';')[1]
+    meme_path = os.path.join(MEMES_PATH, meme_to_show)
+    right_now = time.asctime()
+    if not os.path.isfile(meme_path):
+        update.callback_query.message.edit_text(f"No such file!", reply_markup=files_keyboard())
+    else:
+        with open(meme_path, 'rb') as f:
+            update.callback_query.message.edit_text(f"Showing meme {meme_to_show} ({right_now})",
+                                                    reply_markup=file_actions_keyboard(meme_to_show))
+            update.callback_query.message.reply_video(video=f, reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton(text='Close', callback_data='close')]
+            ]))
 
 
 #### Keyboards ####
@@ -326,7 +342,8 @@ def file_actions_keyboard(filename):
         [InlineKeyboardButton(text='Send Next', callback_data=f'c;{filename}'),  # c -> Chosen meme for next send
          InlineKeyboardButton(text='Send Now', callback_data=f'fsn;{filename}')],  # fsn -> force send now.
         [InlineKeyboardButton(text='Delete', callback_data=f'd;{filename}'),  # d -> delete this meme
-         InlineKeyboardButton(text='Go Back', callback_data='files_menu')]  # go back to files menu
+         InlineKeyboardButton(text='Show', callback_data=f'shw;{filename}')],  # shw -> show meme
+        [InlineKeyboardButton(text='Go Back', callback_data='files_menu')]  # go back to files menu
     ])
 
 
