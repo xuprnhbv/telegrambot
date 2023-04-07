@@ -88,6 +88,7 @@ def get_inline_handlers():
         CallbackQueryHandler(choose_next_meme_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'c')),
         CallbackQueryHandler(file_actions_inline_menu, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'f')),
         CallbackQueryHandler(force_send_now_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'fsn')),
+        CallbackQueryHandler(show_meme_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'shw')),
         CallbackQueryHandler(force_send_now_yn_inline, pattern="^(fsn@_@){1}((yes)|(no)){1}"),
         CallbackQueryHandler(delete_meme_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'd')),
         CallbackQueryHandler(kick_chat_inline, pattern=INLINE_REGEX.replace('COMMAND_CHAR', 'chtkick')),
@@ -116,7 +117,8 @@ def files_inline_menu(update, context):
 def file_actions_inline_menu(update, _):
     file_chosen = update.callback_query.data.split(';')[1]
     update.callback_query.message.edit_text(f'Chose {file_chosen}. Choose an action or go back.',
-                                            reply_markup=file_actions_keyboard(file_chosen), video=None)
+                                            reply_markup=file_actions_keyboard(file_chosen))
+    update.callback_query.message.edit_media(video=None)
 
 
 def close_inline_menu(update, _):
@@ -273,8 +275,9 @@ def show_meme_inline(update, _):
         update.callback_query.message.edit_text(f"No such file!", reply_markup=files_keyboard())
     else:
         with open(meme_path, 'rb') as f:
-            update.callback_query.message.edit_text(f"Showing meme {meme_to_show}", video=f,
+            update.callback_query.message.edit_text(f"Showing meme {meme_to_show}",
                                                     reply_markup=file_actions_keyboard(meme_to_show))
+            update.callback_query.message.edit_media(video=f)
 
 
 #### Keyboards ####
