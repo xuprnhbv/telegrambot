@@ -209,7 +209,7 @@ def choose_next_meme_inline(update, _):
     meme_to_send = update.callback_query.data.split(';')[1]
     choose_next_meme(meme_to_send)
     update.callback_query.message.edit_text(f"Next meme to be sent is {meme_to_send}",
-                                            reply_markup=files_keyboard())
+                                            reply_markup=file_actions_keyboard(meme_to_send))
 
 
 def get_version_inline(update, _):
