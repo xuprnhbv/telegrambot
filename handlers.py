@@ -196,7 +196,7 @@ def force_send_now_inline(update, _):
 def force_send_now_yn_inline(update, context):
     answer, meme_to_send = update.callback_query.data.split('@_@')[1:3]
     if answer == 'yes':
-        choose_next_meme(meme_to_send)
+        choose_next_meme(meme_to_send if meme_to_send != "None" else None)
         send_random_meme(context)
         # we return to files menu because the current file is deleted!
         update.callback_query.message.edit_text(f'Sent meme {meme_to_send}. Returned to files menu'
