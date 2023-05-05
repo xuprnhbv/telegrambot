@@ -36,6 +36,7 @@ def send_random_meme(updater):
         updater.bot.send_message(chat_id=MANAGEMENT_CHAT, text="NO MEME TO SEND! ADD A MEME AND USE /forcesend!!!!")
         return
 
+    logger.print_log(f"Boolean form of chosen_meme {bool(chosen_meme)}")
     if chosen_meme is not None:
         logger.print_log('{text}Meme {meme_name} was chosen beforehand! skipping random meme...'.format(
             meme_name=chosen_meme, text=TEXT_COLOR))
