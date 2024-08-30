@@ -1,6 +1,5 @@
 from telegram.ext import Updater
-from colorama import Fore
-from consts import DAILY_MEME_HOUR, TEXT_COLOR, MEMES_PATH, BOKER_TOV, MANAGEMENT_CHAT
+from consts import DAILY_MEME_HOUR, MEMES_PATH, BOKER_TOV, MANAGEMENT_CHAT
 from files import delete_meme
 from chats import _get_chats
 import logger
@@ -37,14 +36,14 @@ def send_random_meme(updater):
         return
 
     if chosen_meme is not None:
-        logger.print_log('{text}Meme {meme_name} was chosen beforehand! skipping random meme...'.format(
-            meme_name=chosen_meme, text=TEXT_COLOR))
+        logger.print_log('Meme {meme_name} was chosen beforehand! skipping random meme...'.format(
+            meme_name=chosen_meme))
         meme = chosen_meme
         chosen_meme = None
     else:
-        logger.print_log('{text}Choosing daily meme...'.format(text=TEXT_COLOR))
+        logger.print_log('Choosing daily meme...')
         meme = choose_random_meme()
-    logger.print_log('{text}Chosen {green}{}{text}! Sending meme...'.format(meme, green=Fore.LIGHTGREEN_EX, text=TEXT_COLOR))
+    logger.print_log('Chosen {}! Sending meme...'.format(meme))
     meme_caption = BOKER_TOV + meme[16:-4]
     send_count = 0
     send_meme_to = get_chat_list()
@@ -52,24 +51,24 @@ def send_random_meme(updater):
         with open(os.path.join(MEMES_PATH, meme), 'rb') as meme_file:
             for cid in send_meme_to:
                 updater.bot.send_video(chat_id=cid, caption=meme_caption, video=meme_file)
-                logger.print_log('{text}Meme sent to {yellow}{}{text}!'.format(cid, yellow=Fore.LIGHTYELLOW_EX, text=TEXT_COLOR))
+                logger.print_log('Meme sent to {}!'.format(cid))
                 meme_file.seek(0)
                 send_count += 1
-        logger.print_log('{green}Finished sending daily meme!'.format(green=Fore.LIGHTGREEN_EX))
+        logger.print_log('Finished sending daily meme!')
     except Exception as e:
-        logger.print_log('{error}Exception raised: {}{text}'.format(str(e), error=Fore.LIGHTRED_EX, text=TEXT_COLOR))
-        updater.bot.send_message(chat_id=MANAGEMENT_CHAT, text='failed to send meme :(')
+        logger.print_log('Exception raised: {}'.format(str(e)))
+        updater.bot.send_message(chat_id=MANAGEMENT_CHAT, text='Failed to send meme :(')
 
     try:
         if send_count > 0:
             delete_meme(meme)
-            logger.print_log('{text}Deleted file {yellow}{}{text}'.format(meme, yellow=Fore.LIGHTYELLOW_EX, text=TEXT_COLOR))
+            logger.print_log('Deleted file {}'.format(meme))
             if len(os.listdir(MEMES_PATH)) == 1:
                 logger.print_log('1 meme left!')
                 updater.bot.send_message(chat_id=MANAGEMENT_CHAT, text="One meme left! Make sure to add another one"
                                                                        " before tomorrow!")
     except Exception as e:
-        logger.print_log('{error}Exception raised: {}{text}'.format(str(e), error=Fore.LIGHTRED_EX, text=TEXT_COLOR))
+        logger.print_log('Exception raised: {}'.format(str(e)))
 
 
 def choose_random_meme():

@@ -1,10 +1,9 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler, Dispatcher
 from telegram import constants, InlineKeyboardButton, InlineKeyboardMarkup, Chat, Update
-from colorama import Fore
 from files import download_meme, delete_meme, MEMES_PATH
 from dailymeme import send_random_meme, choose_next_meme, get_chat_list, is_next_meme_chosen, get_chosen_meme
 from chats import _get_chats
-from consts import TEXT_COLOR, MANAGEMENT_CHAT, DATE_REGEX, EFI_ID, CHAT_IDS_PATH, \
+from consts import MANAGEMENT_CHAT, DATE_REGEX, EFI_ID, CHAT_IDS_PATH, \
     INLINE_REGEX
 import logger
 import re
@@ -24,7 +23,7 @@ def add_all_handlers(updater: Updater):
     :param updater: the bot's updater.
     :return: list of handlers that failed being added.
     """
-    logger.print_log('{text}Setting up dispatcher...'.format(text=TEXT_COLOR))
+    logger.print_log('Setting up dispatcher...')
     dispatcher = updater.dispatcher
     handler_arr = [
         MessageHandler(Filters.video & Filters.chat(MANAGEMENT_CHAT), save_meme),
@@ -35,11 +34,11 @@ def add_all_handlers(updater: Updater):
 
     failed_handlers = []
     for handler in handler_arr:
-        logger.print_log('{text}Adding Handler {}...'.format(str(handler), text=Fore.LIGHTYELLOW_EX))
+        logger.print_log('Adding Handler {}...'.format(str(handler)))
         try:
             dispatcher.add_handler(handler)
         except Exception as e:
-            logger.print_log('{error}Exception raised: {}{text}'.format(str(e), error=Fore.LIGHTRED_EX))
+            logger.print_log('Exception raised: {}'.format(str(e)))
             failed_handlers.append(handler)
 
     return failed_handlers
@@ -48,23 +47,23 @@ def add_all_handlers(updater: Updater):
 ################### NON INLINE HANDLERS #############################
 
 def save_meme(update, context):
-    logger.print_log('{text}Saving meme...'.format(text=TEXT_COLOR))
+    logger.print_log('Saving meme...')
     file = update.message.effective_attachment.get_file()
     name = update.message.caption
     filename = ''
     try:
         filename = download_meme(file, name)
     except Exception as e:
-        logger.print_log('{error}Exception raised: {}'.format(str(e), error=Fore.LIGHTRED_EX))
+        logger.print_log('Exception raised: {}'.format(str(e)))
 
     if filename:
         logger.print_log(
-            '{text}Saved new meme: {yellow}{}{text}'.format(filename, text=TEXT_COLOR, yellow=Fore.LIGHTYELLOW_EX))
+            'Saved new meme: {}'.format(filename))
         context.bot.send_message(chat_id=MANAGEMENT_CHAT, text='Saved successfully as {}'.format(filename))
 
 
 def at_efi(update, context):
-    logger.print_log('{text}@ing Efi...'.format(text=TEXT_COLOR))
+    logger.print_log('@ing Efi...')
     context.bot.send_message(chat_id=update.effective_chat.id, text=f'[@Ofir](tg://user?id={EFI_ID})',
                              parse_mode="Markdown")
 
@@ -222,7 +221,7 @@ def get_version_inline(update, _):
 
 
 def force_send_meme(update, context):
-    logger.print_log('{text}Force sending meme...'.format(text=TEXT_COLOR))
+    logger.print_log('Force sending meme...')
     send_random_meme(context)
     update.callback_query.message.edit_text('Force sent meme.')
 
