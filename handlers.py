@@ -1,10 +1,9 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler, Dispatcher
 from telegram import constants, InlineKeyboardButton, InlineKeyboardMarkup, Chat, Update
-from colorama import Fore
 from files import download_meme, delete_meme, MEMES_PATH
 from dailymeme import send_random_meme, choose_next_meme, get_chat_list, is_next_meme_chosen, get_chosen_meme
 from chats import _get_chats
-from consts import TEXT_COLOR, MANAGEMENT_CHAT, DATE_REGEX, EFI_ID, CHAT_IDS_PATH, \
+from consts import MANAGEMENT_CHAT, DATE_REGEX, EFI_ID, CHAT_IDS_PATH, \
     INLINE_REGEX
 import logger
 import re

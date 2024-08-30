@@ -1,8 +1,7 @@
 from telegram.ext import Updater
-from colorama import Fore, init
 from handlers import add_all_handlers
 from dailymeme import init_daily_meme
-from consts import TEXT_COLOR, DAILY_MEME_HOUR, RELATIVE_TOKEN_PATH
+from consts import DAILY_MEME_HOUR, RELATIVE_TOKEN_PATH
 import logger
 import threading
 import os

@@ -1,6 +1,5 @@
 from telegram.ext import Updater
-from colorama import Fore
-from consts import DAILY_MEME_HOUR, TEXT_COLOR, MEMES_PATH, BOKER_TOV, MANAGEMENT_CHAT
+from consts import DAILY_MEME_HOUR, MEMES_PATH, BOKER_TOV, MANAGEMENT_CHAT
 from files import delete_meme
 from chats import _get_chats
 import logger
