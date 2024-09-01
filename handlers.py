@@ -57,12 +57,12 @@ async def save_meme(update, context):
     if filename:
         logger.print_log(
             'Saved new meme: {}'.format(filename))
-        context.bot.send_message(chat_id=MANAGEMENT_CHAT, text='Saved successfully as {}'.format(filename))
+        await context.bot.send_message(chat_id=MANAGEMENT_CHAT, text='Saved successfully as {}'.format(filename))
 
 
 async def at_efi(update, context):
     logger.print_log('@ing Efi...')
-    context.bot.send_message(chat_id=update.effective_chat.id, text=f'[@Ofir](tg://user?id={EFI_ID})',
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=f'[@Ofir](tg://user?id={EFI_ID})',
                              parse_mode="Markdown")
 
 
@@ -151,7 +151,7 @@ async def subscribe_inline(update, context):
     # to change the button received from _get_proper_sub_button.
     await update.callback_query.message.edit_text('Successfully subscribed',
                                             reply_markup=main_keyboard(update.effective_chat))
-    context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Added {update.effective_chat.type} to daily memes: "
+    await context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Added {update.effective_chat.type} to daily memes: "
                                                            f"{name} ({update.effective_chat.id})!!")
 
 
@@ -168,7 +168,7 @@ async def unsubscribe_inline(update, context):
     # to change the button received from _get_proper_sub_button.
     await update.callback_query.message.edit_text("Unsubscribed successfully",
                                             reply_markup=main_keyboard(update.effective_chat))
-    context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Removed {name} from daily meme chats!!")
+    await context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Removed {name} from daily meme chats!!")
 
 
 async def force_send_now_inline(update, _):
