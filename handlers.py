@@ -47,7 +47,7 @@ def add_all_handlers(app: Application):
 async def save_meme(update, context):
     logger.print_log('Saving meme...')
     file = await update.message.effective_attachment.get_file()
-    name = await update.message.caption
+    name = update.message.caption
     filename = ''
     try:
         filename = download_meme(file, name)
