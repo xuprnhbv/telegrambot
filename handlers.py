@@ -272,9 +272,9 @@ async def show_meme_inline(update, _):
         await update.callback_query.message.edit_text(f"No such file!", reply_markup=files_keyboard())
     else:
         with open(meme_path, 'rb') as f:
-            update.callback_query.message.edit_text(f"Showing meme {meme_to_show} ({right_now})",
+            await update.callback_query.message.edit_text(f"Showing meme {meme_to_show} ({right_now})",
                                                     reply_markup=file_actions_keyboard(meme_to_show))
-            update.callback_query.message.reply_video(video=f, reply_markup=InlineKeyboardMarkup([
+            await update.callback_query.message.reply_video(video=f, reply_markup=InlineKeyboardMarkup([
                 [InlineKeyboardButton(text='Close', callback_data='close')]
             ]))
 
