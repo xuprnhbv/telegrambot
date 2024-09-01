@@ -14,7 +14,7 @@ def get_token():
     :return: bot token. None if something is invalid.
     """
     with open(RELATIVE_TOKEN_PATH, 'r') as token_file:
-        return token_file.read()
+        return token_file.read().rstrip('\n')
 
 def main(bg):
     token_path = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), RELATIVE_TOKEN_PATH))
