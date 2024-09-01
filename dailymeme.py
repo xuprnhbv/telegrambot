@@ -7,6 +7,7 @@ import schedule
 import time
 import os
 import random
+import asyncio
 
 chosen_meme = None
 
@@ -16,11 +17,13 @@ def init_daily_meme(app):
     Initiates the daily meme schedule
     :param app: the bot's app object
     """
-    schedule.every().day.at(DAILY_MEME_HOUR).do(send_random_meme, app=app)
+    schedule.every().day.at(DAILY_MEME_HOUR).do(async_send_random_meme, app=app)
     while True:
         schedule.run_pending()
         time.sleep(1)
 
+def async_send_random_meme(app):
+    return asyncio.run(send_random_meme(app))
 
 async def send_random_meme(app):
     """
@@ -31,7 +34,7 @@ async def send_random_meme(app):
     global chosen_meme
     if len(os.listdir(MEMES_PATH)) == 0:
         logger.print_log('NO MEME TO SEND!!!!!')
-        app.bot.send_message(chat_id=MANAGEMENT_CHAT, text="NO MEME TO SEND! ADD A MEME AND USE /forcesend!!!!")
+        await app.bot.send_message(chat_id=MANAGEMENT_CHAT, text="NO MEME TO SEND! ADD A MEME AND USE /forcesend!!!!")
         return
 
     if chosen_meme is not None:
