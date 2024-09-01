@@ -75,7 +75,7 @@ def get_inline_handlers():
         CallbackQueryHandler(main_inline_menu, pattern='main_menu'),
         CallbackQueryHandler(files_inline_menu, pattern='files_menu'),
         CallbackQueryHandler(chats_inline_menu, pattern='chats_menu'),
-        # CallbackQueryHandler(get_version_inline, pattern='version'),
+        CallbackQueryHandler(get_version_inline, pattern='version'),
         CallbackQueryHandler(force_send_now_inline, pattern='force_send'),
         CallbackQueryHandler(subscribe_inline, pattern='subscribe'),
         CallbackQueryHandler(unsubscribe_inline, pattern='unsubscribe'),
