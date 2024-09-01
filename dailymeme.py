@@ -49,7 +49,7 @@ def send_random_meme(app):
     try:
         with open(os.path.join(MEMES_PATH, meme), 'rb') as meme_file:
             for cid in send_meme_to:
-                await app.bot.send_video(chat_id=cid, caption=meme_caption, video=meme_file)
+                app.bot.send_video(chat_id=cid, caption=meme_caption, video=meme_file)
                 logger.print_log('Meme sent to {}!'.format(cid))
                 meme_file.seek(0)
                 send_count += 1
