@@ -194,7 +194,7 @@ async def force_send_now_yn_inline(update, context):
     answer, meme_to_send = update.callback_query.data.split('@_@')[1:3]
     if answer == 'yes':
         choose_next_meme(meme_to_send if meme_to_send != "None" else None)
-        send_random_meme(context)
+        await send_random_meme(context)
         # we return to files menu because the current file is deleted!
         await update.callback_query.message.edit_text(f'Sent meme {meme_to_send}. Returned to files menu'
                                                 , reply_markup=files_keyboard())
@@ -220,7 +220,7 @@ async def get_version_inline(update, _):
 
 async def force_send_meme(update, context):
     logger.print_log('Force sending meme...')
-    send_random_meme(context)
+    await send_random_meme(context)
     await update.callback_query.message.edit_text('Force sent meme.')
 
 
