@@ -18,7 +18,7 @@ def get_token():
 
 def main(bg):
     token_path = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), RELATIVE_TOKEN_PATH))
-    logger.log_setup(print_console=bg)
+    logger.log_setup(print_console=not bg)
     logger.print_log('Getting bot token from {}...'.format(token_path))
     token = get_token()
     logger.print_log('Token: {}'.format(token))
