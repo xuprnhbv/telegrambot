@@ -44,10 +44,10 @@ def add_all_handlers(app: Application):
 
 ################### NON INLINE HANDLERS #############################
 
-def save_meme(update, context):
+async def save_meme(update, context):
     logger.print_log('Saving meme...')
-    file = update.message.effective_attachment.get_file()
-    name = update.message.caption
+    file = await update.message.effective_attachment.get_file()
+    name = await update.message.caption
     filename = ''
     try:
         filename = download_meme(file, name)
@@ -60,7 +60,7 @@ def save_meme(update, context):
         context.bot.send_message(chat_id=MANAGEMENT_CHAT, text='Saved successfully as {}'.format(filename))
 
 
-def at_efi(update, context):
+async def at_efi(update, context):
     logger.print_log('@ing Efi...')
     context.bot.send_message(chat_id=update.effective_chat.id, text=f'[@Ofir](tg://user?id={EFI_ID})',
                              parse_mode="Markdown")
