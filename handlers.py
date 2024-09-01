@@ -1,4 +1,4 @@
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler, Dispatcher
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler
 from telegram import constants, InlineKeyboardButton, InlineKeyboardMarkup, Chat, Update
 from files import download_meme, delete_meme, MEMES_PATH
 from dailymeme import send_random_meme, choose_next_meme, get_chat_list, is_next_meme_chosen, get_chosen_meme
@@ -8,12 +8,12 @@ from consts import MANAGEMENT_CHAT, DATE_REGEX, EFI_ID, CHAT_IDS_PATH, \
 import logger
 import re
 import os
-import git
+# import git
 import time
 import json
 
 
-def add_all_handlers(updater: Updater):
+def add_all_handlers(app: Application):
     """
     Main function for adding all bot handlers to dispatcher.
     Takes the 'handlers_arr' and adds all handlers in it one by one.
@@ -23,11 +23,9 @@ def add_all_handlers(updater: Updater):
     :param updater: the bot's updater.
     :return: list of handlers that failed being added.
     """
-    logger.print_log('Setting up dispatcher...')
-    dispatcher = updater.dispatcher
     handler_arr = [
-        MessageHandler(Filters.video & Filters.chat(MANAGEMENT_CHAT), save_meme),
-        MessageHandler(Filters.regex(r'([cC][sS])+') & (~Filters.command), at_efi),
+        MessageHandler(filters.VIDEO & filters.Chat(MANAGEMENT_CHAT), save_meme),
+        MessageHandler(filters.Regex(r'([cC][sS])+') & (~filters.COMMAND), at_efi),
     ]
 
     handler_arr += get_inline_handlers()
@@ -36,7 +34,7 @@ def add_all_handlers(updater: Updater):
     for handler in handler_arr:
         logger.print_log('Adding Handler {}...'.format(str(handler)))
         try:
-            dispatcher.add_handler(handler)
+            app.add_handler(handler)
         except Exception as e:
             logger.print_log('Exception raised: {}'.format(str(e)))
             failed_handlers.append(handler)
@@ -46,25 +44,25 @@ def add_all_handlers(updater: Updater):
 
 ################### NON INLINE HANDLERS #############################
 
-def save_meme(update, context):
+async def save_meme(update, context):
     logger.print_log('Saving meme...')
-    file = update.message.effective_attachment.get_file()
+    file = await update.message.effective_attachment.get_file()
     name = update.message.caption
     filename = ''
     try:
-        filename = download_meme(file, name)
+        filename = await download_meme(file, name)
     except Exception as e:
         logger.print_log('Exception raised: {}'.format(str(e)))
 
     if filename:
         logger.print_log(
             'Saved new meme: {}'.format(filename))
-        context.bot.send_message(chat_id=MANAGEMENT_CHAT, text='Saved successfully as {}'.format(filename))
+        await context.bot.send_message(chat_id=MANAGEMENT_CHAT, text='Saved successfully as {}'.format(filename))
 
 
-def at_efi(update, context):
+async def at_efi(update, context):
     logger.print_log('@ing Efi...')
-    context.bot.send_message(chat_id=update.effective_chat.id, text=f'[@Ofir](tg://user?id={EFI_ID})',
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=f'[@Ofir](tg://user?id={EFI_ID})',
                              parse_mode="Markdown")
 
 
@@ -96,49 +94,49 @@ def get_inline_handlers():
 
 
 #### Bot ####
-def main_inline_menu(update, _):
+async def main_inline_menu(update, _):
     try:
-        update.callback_query.message.edit_text(
+        await update.callback_query.message.edit_text(
             f'Choose an option to begin, {update.effective_user.first_name}.',
             reply_markup=main_keyboard(update.effective_chat))
     except AttributeError:
-        update.message.reply_text(f'Choose an option to begin, {update.effective_user.first_name}.',
+        await update.message.reply_text(f'Choose an option to begin, {update.effective_user.first_name}.',
                                   reply_markup=main_keyboard(update.effective_chat))
-        update.message.delete()  # worse case it'll fail.
+        await update.message.delete()  # worse case it'll fail.
 
 
-def files_inline_menu(update, context):
+async def files_inline_menu(update, context):
     length = len(os.listdir(MEMES_PATH))
-    update.callback_query.message.edit_text(f'Meme List ({length}). Choose a file to continue.'
+    await update.callback_query.message.edit_text(f'Meme List ({length}). Choose a file to continue.'
                                             , reply_markup=files_keyboard())
 
 
-def file_actions_inline_menu(update, _):
+async def file_actions_inline_menu(update, _):
     file_chosen = update.callback_query.data.split(';')[1]
-    update.callback_query.message.edit_text(f'Chose {file_chosen}. Choose an action or go back.',
+    await update.callback_query.message.edit_text(f'Chose {file_chosen}. Choose an action or go back.',
                                             reply_markup=file_actions_keyboard(file_chosen))
 
 
-def close_inline_menu(update, _):
-    update.callback_query.message.delete()
+async def close_inline_menu(update, _):
+    await update.callback_query.message.delete()
 
 
-def chats_inline_menu(update, _):
-    update.callback_query.message.edit_text(f'Chat list', reply_markup=chats_keyboard())
+async def chats_inline_menu(update, _):
+    await update.callback_query.message.edit_text(f'Chat list', reply_markup=chats_keyboard())
 
 
-def chat_actions_inline_menu(update, _):
+async def chat_actions_inline_menu(update, _):
     chat_chosen = update.callback_query.data.split(';')[1]
     chats = _get_chats()
-    update.callback_query.message.edit_text(f'Choose an action for chat {chats[chat_chosen]}',
+    await update.callback_query.message.edit_text(f'Choose an action for chat {chats[chat_chosen]}',
                                             reply_markup=chat_actions_keyboard(chat_chosen))
 
 
-def subscribe_inline(update, context):
+async def subscribe_inline(update, context):
     # Since we use inline, we can skip checking whether the user is subbed or not.
     chats = _get_chats()
     if str(update.effective_chat.id) in chats.keys():
-        update.callback_query.message.edit_text('You are subscribed already, somehow? Please contact Ido',
+        await update.callback_query.message.edit_text('You are subscribed already, somehow? Please contact Ido',
                                                 reply_markup=main_keyboard(update.effective_chat))
         logger.print_log(f'Chat {update.effective_chat.id} somehow managed to subscribe_inline while being subscribed.'
                          f'Callback data: "{update.callback_query.data}"')
@@ -151,16 +149,16 @@ def subscribe_inline(update, context):
         json.dump(chats, fd)
     # currently, this option is only accessible from the main menu, therefore we return to it. We recall the function
     # to change the button received from _get_proper_sub_button.
-    update.callback_query.message.edit_text('Successfully subscribed',
+    await update.callback_query.message.edit_text('Successfully subscribed',
                                             reply_markup=main_keyboard(update.effective_chat))
-    context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Added {update.effective_chat.type} to daily memes: "
+    await context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Added {update.effective_chat.type} to daily memes: "
                                                            f"{name} ({update.effective_chat.id})!!")
 
 
-def unsubscribe_inline(update, context):
+async def unsubscribe_inline(update, context):
     chats = _get_chats()
     if str(update.effective_chat.id) not in chats.keys():
-        update.callback_query.message.edit_text('You are not subscribed, somehow? Please contact Ido')
+        await update.callback_query.message.edit_text('You are not subscribed, somehow? Please contact Ido')
         return
     chats.pop(str(update.effective_chat.id))
     with open(CHAT_IDS_PATH, 'w') as fd:
@@ -168,22 +166,22 @@ def unsubscribe_inline(update, context):
     name = update.effective_chat.username or update.effective_chat.title
     # currently, this option is only accessible from the main menu, therefore we return to it. We recall the function
     # to change the button received from _get_proper_sub_button.
-    update.callback_query.message.edit_text("Unsubscribed successfully",
+    await update.callback_query.message.edit_text("Unsubscribed successfully",
                                             reply_markup=main_keyboard(update.effective_chat))
-    context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Removed {name} from daily meme chats!!")
+    await context.bot.send_message(chat_id=MANAGEMENT_CHAT, text=f"!!Removed {name} from daily meme chats!!")
 
 
-def force_send_now_inline(update, _):
+async def force_send_now_inline(update, _):
     if update.callback_query.data == 'force_send':
         meme_to_send = None  # its none so we randomize
     else:
         meme_to_send = update.callback_query.data.split(';')[1]
     if meme_to_send and meme_to_send not in os.listdir(MEMES_PATH):
-        update.callback_query.message.edit_text(f"File {meme_to_send} does not exist!", reply_markup=files_keyboard())
+        await update.callback_query.message.edit_text(f"File {meme_to_send} does not exist!", reply_markup=files_keyboard())
         return
     # yeah im lazy im doing this menu here. fuck you too!
     message = f"You sure you want to force send {meme_to_send} right now?" if meme_to_send else "Force send right now?"
-    update.callback_query.message.edit_text(message,
+    await update.callback_query.message.edit_text(message,
                                             reply_markup=InlineKeyboardMarkup([[
                                                 InlineKeyboardButton('Yes',
                                                                      callback_data=f'fsn@_@yes@_@{meme_to_send}'),
@@ -192,91 +190,91 @@ def force_send_now_inline(update, _):
                                             ]]))
 
 
-def force_send_now_yn_inline(update, context):
+async def force_send_now_yn_inline(update, context):
     answer, meme_to_send = update.callback_query.data.split('@_@')[1:3]
     if answer == 'yes':
         choose_next_meme(meme_to_send if meme_to_send != "None" else None)
-        send_random_meme(context)
+        await send_random_meme(context)
         # we return to files menu because the current file is deleted!
-        update.callback_query.message.edit_text(f'Sent meme {meme_to_send}. Returned to files menu'
+        await update.callback_query.message.edit_text(f'Sent meme {meme_to_send}. Returned to files menu'
                                                 , reply_markup=files_keyboard())
     else:
-        update.callback_query.message.edit_text('Did not send meme.', reply_markup=file_actions_keyboard(meme_to_send))
+        await update.callback_query.message.edit_text('Did not send meme.', reply_markup=file_actions_keyboard(meme_to_send))
 
 
-def choose_next_meme_inline(update, _):
+async def choose_next_meme_inline(update, _):
     meme_to_send = update.callback_query.data.split(';')[1]
     choose_next_meme(meme_to_send)
-    update.callback_query.message.edit_text(f"Next meme to be sent is {meme_to_send}",
+    await update.callback_query.message.edit_text(f"Next meme to be sent is {meme_to_send}",
                                             reply_markup=file_actions_keyboard(meme_to_send))
 
 
-def get_version_inline(update, _):
+async def get_version_inline(update, _):
     repo = git.Repo(search_parent_directories=True)
     current_ver_date = time.ctime(repo.head.commit.committed_date)
     current_ver_sha = repo.head.commit.hexsha
-    update.callback_query.message.edit_text(f"Branch: {repo.active_branch.name}\nLast Commit Date: "
+    await update.callback_query.message.edit_text(f"Branch: {repo.active_branch.name}\nLast Commit Date: "
                                             f"{current_ver_date}\nCommit SHA: {current_ver_sha}",
                                             reply_markup=main_keyboard(update.effective_chat))
 
 
-def force_send_meme(update, context):
+async def force_send_meme(update, context):
     logger.print_log('Force sending meme...')
-    send_random_meme(context)
-    update.callback_query.message.edit_text('Force sent meme.')
+    await send_random_meme(context)
+    await update.callback_query.message.edit_text('Force sent meme.')
 
 
-def show_next_meme(update, _):
+async def show_next_meme(update, _):
     next_meme = get_chosen_meme()
-    update.callback_query.message.edit_text(f'Next meme is {next_meme}',
+    await update.callback_query.message.edit_text(f'Next meme is {next_meme}',
                                             reply_markup=main_keyboard(update.effective_chat))
 
 
-def reset_next_meme(update, _):
+async def reset_next_meme(update, _):
     choose_next_meme(None)
-    update.callback_query.message.edit_text('Reset next meme', reply_markup=main_keyboard(update.effective_chat))
+    await update.callback_query.message.edit_text('Reset next meme', reply_markup=main_keyboard(update.effective_chat))
 
 
-def delete_meme_inline(update, _):
+async def delete_meme_inline(update, _):
     meme_to_delete = update.callback_query.data.split(';')[1]
     if meme_to_delete not in os.listdir(MEMES_PATH):
-        update.callback_query.message.edit_text(f'Meme {meme_to_delete} is not a file!',
+        await update.callback_query.message.edit_text(f'Meme {meme_to_delete} is not a file!',
                                                 reply_markup=file_actions_keyboard(meme_to_delete))
         return
     try:
         os.remove(os.path.join(MEMES_PATH, meme_to_delete))
     finally:
         if meme_to_delete not in os.listdir(MEMES_PATH):
-            update.callback_query.message.edit_text(f'Meme {meme_to_delete} was successfully deleted!',
+            await update.callback_query.message.edit_text(f'Meme {meme_to_delete} was successfully deleted!',
                                                     reply_markup=files_keyboard())
         else:
-            update.callback_query.message.edit_text('Failed to delete :(',
+            await update.callback_query.message.edit_text('Failed to delete :(',
                                                     reply_markup=file_actions_keyboard(meme_to_delete))
 
 
-def kick_chat_inline(update, _):
+async def kick_chat_inline(update, _):
     rmchat_id = update.callback_query.data.split(';')[1]
     chats = _get_chats()
     if rmchat_id not in chats.keys():
-        update.callback_query.message.edit_text('Not a valid subbed chat', reply_markup=chats_keyboard())
+        await update.callback_query.message.edit_text('Not a valid subbed chat', reply_markup=chats_keyboard())
         return
     chats.pop(rmchat_id)
     with open(CHAT_IDS_PATH, 'w') as fd:
         json.dump(chats, fd)
-    update.callback_query.message.edit_text(f'Removed chat {rmchat_id}', reply_markup=chats_keyboard())
+    await update.callback_query.message.edit_text(f'Removed chat {rmchat_id}', reply_markup=chats_keyboard())
 
 
-def show_meme_inline(update, _):
+async def show_meme_inline(update, _):
     meme_to_show = update.callback_query.data.split(';')[1]
     meme_path = os.path.join(MEMES_PATH, meme_to_show)
     right_now = time.asctime()
     if not os.path.isfile(meme_path):
-        update.callback_query.message.edit_text(f"No such file!", reply_markup=files_keyboard())
+        await update.callback_query.message.edit_text(f"No such file!", reply_markup=files_keyboard())
     else:
         with open(meme_path, 'rb') as f:
-            update.callback_query.message.edit_text(f"Showing meme {meme_to_show} ({right_now})",
+            await update.callback_query.message.edit_text(f"Showing meme {meme_to_show} ({right_now})",
                                                     reply_markup=file_actions_keyboard(meme_to_show))
-            update.callback_query.message.reply_video(video=f, reply_markup=InlineKeyboardMarkup([
+            await update.callback_query.message.reply_video(video=f, reply_markup=InlineKeyboardMarkup([
                 [InlineKeyboardButton(text='Close', callback_data='close')]
             ]))
 

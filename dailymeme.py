@@ -1,4 +1,4 @@
-from telegram.ext import Updater
+from telegram.ext import Application
 from consts import DAILY_MEME_HOUR, MEMES_PATH, BOKER_TOV, MANAGEMENT_CHAT
 from files import delete_meme
 from chats import _get_chats
@@ -7,32 +7,34 @@ import schedule
 import time
 import os
 import random
+import asyncio
 
 chosen_meme = None
 
 
-def init_daily_meme(updater):
+def init_daily_meme(app):
     """
     Initiates the daily meme schedule
-    :param updater: the bot's updater object
+    :param app: the bot's app object
     """
-    schedule.every().day.at(DAILY_MEME_HOUR).do(send_random_meme, updater=updater)
+    schedule.every().day.at(DAILY_MEME_HOUR).do(async_send_random_meme, app=app)
     while True:
         schedule.run_pending()
         time.sleep(1)
 
+def async_send_random_meme(app):
+    return asyncio.run(send_random_meme(app))
 
-def send_random_meme(updater):
-    # type: (telegram.Updater) -> None
+async def send_random_meme(app):
     """
     Chooses a random file from the videos folder and sends it to everyone who wants memes :)
-    :param updater: the bot's updater object
+    :param app: the bot's app object
     :return:
     """
     global chosen_meme
     if len(os.listdir(MEMES_PATH)) == 0:
         logger.print_log('NO MEME TO SEND!!!!!')
-        updater.bot.send_message(chat_id=MANAGEMENT_CHAT, text="NO MEME TO SEND! ADD A MEME AND USE /forcesend!!!!")
+        await app.bot.send_message(chat_id=MANAGEMENT_CHAT, text="NO MEME TO SEND! ADD A MEME AND USE /forcesend!!!!")
         return
 
     if chosen_meme is not None:
@@ -50,14 +52,14 @@ def send_random_meme(updater):
     try:
         with open(os.path.join(MEMES_PATH, meme), 'rb') as meme_file:
             for cid in send_meme_to:
-                updater.bot.send_video(chat_id=cid, caption=meme_caption, video=meme_file)
+                await app.bot.send_video(chat_id=cid, caption=meme_caption, video=meme_file)
                 logger.print_log('Meme sent to {}!'.format(cid))
                 meme_file.seek(0)
                 send_count += 1
         logger.print_log('Finished sending daily meme!')
     except Exception as e:
         logger.print_log('Exception raised: {}'.format(str(e)))
-        updater.bot.send_message(chat_id=MANAGEMENT_CHAT, text='Failed to send meme :(')
+        app.bot.send_message(chat_id=MANAGEMENT_CHAT, text='Failed to send meme :(')
 
     try:
         if send_count > 0:
@@ -65,7 +67,7 @@ def send_random_meme(updater):
             logger.print_log('Deleted file {}'.format(meme))
             if len(os.listdir(MEMES_PATH)) == 1:
                 logger.print_log('1 meme left!')
-                updater.bot.send_message(chat_id=MANAGEMENT_CHAT, text="One meme left! Make sure to add another one"
+                app.bot.send_message(chat_id=MANAGEMENT_CHAT, text="One meme left! Make sure to add another one"
                                                                        " before tomorrow!")
     except Exception as e:
         logger.print_log('Exception raised: {}'.format(str(e)))

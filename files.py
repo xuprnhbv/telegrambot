@@ -4,7 +4,7 @@ import time
 import os
 
 
-def download_meme(file: File, name: str):
+async def download_meme(file: File, name: str):
     """
     Download file from chat and save it, with the caption as the <current time>_<name>.mp4
     name should be only emojies. these are the ones that will come after the boker tov.
@@ -16,7 +16,7 @@ def download_meme(file: File, name: str):
     path = os.path.abspath(os.path.join(MEMES_PATH, time.strftime("%Y%m%d-%H%M%S") + '_' + name + '.mp4'))
     if os.path.lexists(path):
         path = os.path.abspath(os.path.join(MEMES_PATH, name + '.mp4'))
-    file.download(path)
+    await file.download_to_drive(path)
     return path
 
 
