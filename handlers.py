@@ -209,13 +209,13 @@ async def choose_next_meme_inline(update, _):
                                             reply_markup=file_actions_keyboard(meme_to_send))
 
 
-# async def get_version_inline(update, _):
-#     repo = git.Repo(search_parent_directories=True)
-#     current_ver_date = time.ctime(repo.head.commit.committed_date)
-#     current_ver_sha = repo.head.commit.hexsha
-#     await update.callback_query.message.edit_text(f"Branch: {repo.active_branch.name}\nLast Commit Date: "
-#                                             f"{current_ver_date}\nCommit SHA: {current_ver_sha}",
-#                                             reply_markup=main_keyboard(update.effective_chat))
+async def get_version_inline(update, _):
+    repo = git.Repo(search_parent_directories=True)
+    current_ver_date = time.ctime(repo.head.commit.committed_date)
+    current_ver_sha = repo.head.commit.hexsha
+    await update.callback_query.message.edit_text(f"Branch: {repo.active_branch.name}\nLast Commit Date: "
+                                            f"{current_ver_date}\nCommit SHA: {current_ver_sha}",
+                                            reply_markup=main_keyboard(update.effective_chat))
 
 
 async def force_send_meme(update, context):
