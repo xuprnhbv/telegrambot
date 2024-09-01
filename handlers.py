@@ -50,7 +50,7 @@ async def save_meme(update, context):
     name = update.message.caption
     filename = ''
     try:
-        filename = download_meme(file, name)
+        filename = await download_meme(file, name)
     except Exception as e:
         logger.print_log('Exception raised: {}'.format(str(e)))
 
