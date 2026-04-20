@@ -8,7 +8,7 @@ from consts import MANAGEMENT_CHAT, DATE_REGEX, EFI_ID, CHAT_IDS_PATH, \
 import logger
 import re
 import os
-# import git
+import git
 import time
 import json
 
