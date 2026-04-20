@@ -59,7 +59,7 @@ async def send_random_meme(app):
         logger.print_log('Finished sending daily meme!')
     except Exception as e:
         logger.print_log('Exception raised: {}'.format(str(e)))
-        app.bot.send_message(chat_id=MANAGEMENT_CHAT, text='Failed to send meme :(')
+        await app.bot.send_message(chat_id=MANAGEMENT_CHAT, text='Failed to send meme :(')
 
     try:
         if send_count > 0:
@@ -67,7 +67,7 @@ async def send_random_meme(app):
             logger.print_log('Deleted file {}'.format(meme))
             if len(os.listdir(MEMES_PATH)) == 1:
                 logger.print_log('1 meme left!')
-                app.bot.send_message(chat_id=MANAGEMENT_CHAT, text="One meme left! Make sure to add another one"
+                await app.bot.send_message(chat_id=MANAGEMENT_CHAT, text="One meme left! Make sure to add another one"
                                                                        " before tomorrow!")
     except Exception as e:
         logger.print_log('Exception raised: {}'.format(str(e)))
